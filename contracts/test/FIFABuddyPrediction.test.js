@@ -9,8 +9,8 @@ describe("FIFABuddyPrediction", function () {
     const usdt = await MockUSDT.deploy(ethers.parseUnits("1000000", 6));
     await usdt.waitForDeployment();
 
-    const MatchMindPrediction = await ethers.getContractFactory("MatchMindPrediction");
-    const prediction = await MatchMindPrediction.deploy(await usdt.getAddress(), feeRecipient.address);
+    const FIFABuddyPrediction = await ethers.getContractFactory("FIFABuddyPrediction");
+    const prediction = await FIFABuddyPrediction.deploy(await usdt.getAddress(), feeRecipient.address);
     await prediction.waitForDeployment();
 
     const deadline = (await time.latest()) + 3600;

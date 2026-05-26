@@ -32,7 +32,7 @@ async function main() {
   await registry.waitForDeployment();
   console.log("AnalystRegistry:", await registry.getAddress());
 
-  const Prediction = await hre.ethers.getContractFactory("MatchMindPrediction");
+  const Prediction = await hre.ethers.getContractFactory("FIFABuddyPrediction");
   const prediction = await Prediction.deploy(usdtAddress, deployer.address);
   await prediction.waitForDeployment();
   console.log("FIFABuddyPrediction:", await prediction.getAddress());

@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  * @notice Prediction market for World Cup 2026 matches on X Layer
  * @dev Outcomes: 1 = Home Win, 2 = Draw, 3 = Away Win
  */
-contract MatchMindPrediction is Ownable, ReentrancyGuard {
+contract FIFABuddyPrediction is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable usdt;
