@@ -1081,6 +1081,58 @@ select {
   color: var(--danger);
 }
 
+/* —— Footer —— */
+.site-footer {
+  width: min(1320px, calc(100vw - 40px));
+  margin: 18px auto 28px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+}
+
+.site-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.site-footer-copy {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.site-footer-copy strong,
+.site-footer-link {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.site-footer-link {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--text) 45%, transparent 55%);
+  text-underline-offset: 2px;
+}
+
+.site-footer-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-control);
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
 /* —— Agent signal —— */
 .signal-loading {
   padding: 20px 8px;
@@ -1252,6 +1304,11 @@ select {
     padding-top: 12px;
   }
 
+  .site-footer {
+    width: min(100vw - 24px, 100%);
+    margin-bottom: 20px;
+  }
+
   .topbar {
     flex-direction: column;
     align-items: flex-start;
@@ -1340,5 +1397,9 @@ select {
 
   .percent {
     text-align: left;
+  }
+
+  .site-footer-inner {
+    align-items: flex-start;
   }
 }

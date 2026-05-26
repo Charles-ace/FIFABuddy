@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FootballFixture } from "@/lib/football";
 import { signal as fallbackSignal } from "@/lib/mockData";
 
@@ -41,9 +41,16 @@ export function AgentInsights({
   const [isLoading, setIsLoading] = useState(false);
   const [usedFallback, setUsedFallback] = useState(false);
   const [lastRunLabel, setLastRunLabel] = useState("Never");
+  const isRunningRef = useRef(false);
+  const recurringIntervalMs = 90_000;
 
   const runAgentTask = useCallback(
     async (isActive: () => boolean = () => true) => {
+      if (isRunningRef.current) {
+        return;
+      }
+
+      isRunningRef.current = true;
       setIsLoading(true);
       setUsedFallback(false);
 
@@ -99,6 +106,7 @@ export function AgentInsights({
         if (isActive()) {
           setIsLoading(false);
         }
+        isRunningRef.current = false;
       }
     },
     [communityPosts, fixture, poolOdds.away, poolOdds.draw, poolOdds.home]
@@ -109,11 +117,16 @@ export function AgentInsights({
 
     let active = true;
     void runAgentTask(() => active);
+    const intervalId = window.setInterval(() => {
+      if (!active || isRunningRef.current) return;
+      void runAgentTask(() => active);
+    }, recurringIntervalMs);
 
     return () => {
       active = false;
+      window.clearInterval(intervalId);
     };
-  }, [isAutoMode, refreshToken, runAgentTask]);
+  }, [isAutoMode, refreshToken, recurringIntervalMs, runAgentTask]);
 
   const display = signal;
 
@@ -132,11 +145,12 @@ export function AgentInsights({
             flexWrap: "wrap",
             justifyContent: "flex-end",
           }}
-        >
-          <span className="slip-chip">{isAutoMode ? "Auto mode ready" : "Manual review"}</span>
-          <button type="button" className="ghost ghost-sm" onClick={() => void runAgentTask()}>
-            {isLoading ? "Running..." : "Run Agent Task"}
-          </button>
+          >
+            <span className="slip-chip">{isAutoMode ? "Auto mode ready" : "Manual review"}</span>
+            {isAutoMode ? <span className="slip-chip slip-chip-muted">Refreshes every 90s</span> : null}
+            <button type="button" className="ghost ghost-sm" onClick={() => void runAgentTask()}>
+              {isLoading ? "Running..." : "Run Agent Task"}
+            </button>
         </div>
       </div>
 
