@@ -18,8 +18,6 @@ export function SiteFooter() {
             @charlesace_
           </a>
         </div>
-
-        <span className="site-footer-chip">Demo-ready for hackathons</span>
       </div>
     </footer>
   );

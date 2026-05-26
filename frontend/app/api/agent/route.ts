@@ -6,7 +6,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || "" })
 
 export async function POST(req: NextRequest) {
   try {
-    const { fixture, poolOdds, communityPosts } = await req.json();
+    const { fixture, poolOdds, communityPosts, topAnalysts } = await req.json();
 
     const homeTeam = fixture.team1 || fixture.home;
     const awayTeam = fixture.team2 || fixture.away;
@@ -15,7 +15,8 @@ export async function POST(req: NextRequest) {
       model: "claude-sonnet-4-20250514",
       max_tokens: 300,
       system: `You are FIFABuddy, a World Cup 2026 AI prediction agent on X Layer.
-You receive match data, on-chain pool totals, and community sentiment.
+You receive match data, on-chain pool totals, community sentiment, and top analyst consensus.
+When analyst consensus is strong and aligned with the market, prefer a BUY signal for that side if the data supports it.
 Respond ONLY with a valid JSON object. No markdown. No explanation outside JSON.
 Format exactly: 
 { "signal": "BUY" | "HOLD" | "AVOID", "pick": "string", "confidence": number, "reasoning": "max 2 sentences" }`,
@@ -26,6 +27,7 @@ Format exactly:
 Date: ${fixture.date}
 On-chain pool (USDT): Home=${poolOdds.home}, Draw=${poolOdds.draw}, Away=${poolOdds.away}
 Top community picks: ${JSON.stringify(communityPosts?.slice(0, 5) ?? [])}
+Top analyst bets: ${JSON.stringify(topAnalysts?.slice(0, 5) ?? [])}
 What is your signal?`,
         },
       ],

@@ -22,6 +22,7 @@ export type Analyst = {
   winRate: string;
   pnl: string;
   confidence: number;
+  pick: "home" | "draw" | "away";
 };
 
 export type CommunityPost = {
@@ -76,6 +77,7 @@ export const analysts: Analyst[] = [
     winRate: "71%",
     pnl: "+12.4K USDT",
     confidence: 94,
+    pick: "home",
   },
   {
     handle: "TacticianX",
@@ -83,6 +85,7 @@ export const analysts: Analyst[] = [
     winRate: "64%",
     pnl: "+8.1K USDT",
     confidence: 88,
+    pick: "home",
   },
   {
     handle: "PitchOracle",
@@ -90,6 +93,7 @@ export const analysts: Analyst[] = [
     winRate: "59%",
     pnl: "+5.7K USDT",
     confidence: 81,
+    pick: "away",
   },
 ];
 

@@ -6,6 +6,8 @@ type Props = {
 
 export function AnalystRow({ analyst }: Props) {
   const initial = analyst.handle.slice(0, 1).toUpperCase();
+  const pickLabel =
+    analyst.pick === "home" ? "Home bias" : analyst.pick === "away" ? "Away bias" : "Draw bias";
 
   return (
     <div className="analyst-row">
@@ -13,6 +15,7 @@ export function AnalystRow({ analyst }: Props) {
       <div className="analyst-copy">
         <strong>{analyst.handle}</strong>
         <span>{analyst.wallet}</span>
+        <span className="analyst-pick">{pickLabel}</span>
       </div>
       <div className="percent">
         <strong>{analyst.confidence}%</strong>

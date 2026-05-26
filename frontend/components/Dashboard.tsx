@@ -357,6 +357,7 @@ export function Dashboard({ fixtures: initialFixtures }: Props) {
               fixture={activeFixture}
               poolOdds={odds}
               communityPosts={activeMockPosts}
+              topAnalysts={analysts}
               isAutoMode={isAutoMode}
               refreshToken={marketRefreshToken}
               onExecuteSignal={handleAgentExecuteSignal}

@@ -1,8 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FootballFixture } from "@/lib/football";
 import { signal as fallbackSignal } from "@/lib/mockData";
+
+type TopAnalyst = {
+  handle: string;
+  winRate: string;
+  pnl: string;
+  confidence: number;
+  pick: "home" | "draw" | "away";
+};
 
 type Props = {
   fixture: FootballFixture;
@@ -17,6 +25,7 @@ type Props = {
     pick: string;
     upvotes: string;
   }>;
+  topAnalysts: TopAnalyst[];
   isAutoMode?: boolean;
   refreshToken?: number;
   onExecuteSignal?: (signal: AgentSignal) => void;
@@ -29,10 +38,36 @@ type AgentSignal = {
   reasoning: string;
 };
 
+type AnalystConsensus = {
+  pick: "home" | "draw" | "away";
+  label: string;
+  confidence: number;
+  supporters: number;
+};
+
+function getSignalSide(signal: string, fixture: FootballFixture) {
+  const normalizedPick = signal.toLowerCase();
+
+  if (normalizedPick.includes("draw")) {
+    return "draw" as const;
+  }
+
+  if (normalizedPick.includes(fixture.home.toLowerCase())) {
+    return "home" as const;
+  }
+
+  if (normalizedPick.includes(fixture.away.toLowerCase())) {
+    return "away" as const;
+  }
+
+  return null;
+}
+
 export function AgentInsights({
   fixture,
   poolOdds,
   communityPosts,
+  topAnalysts,
   isAutoMode = true,
   refreshToken = 0,
   onExecuteSignal,
@@ -42,7 +77,47 @@ export function AgentInsights({
   const [usedFallback, setUsedFallback] = useState(false);
   const [lastRunLabel, setLastRunLabel] = useState("Never");
   const isRunningRef = useRef(false);
+  const lastAutoExecuteKeyRef = useRef<string | null>(null);
   const recurringIntervalMs = 90_000;
+
+  const analystConsensus = useMemo<AnalystConsensus | null>(() => {
+    const grouped = topAnalysts.reduce(
+      (acc, analyst) => {
+        acc[analyst.pick].push(analyst);
+        return acc;
+      },
+      {
+        home: [] as TopAnalyst[],
+        draw: [] as TopAnalyst[],
+        away: [] as TopAnalyst[],
+      }
+    );
+
+    const ordered = (Object.entries(grouped) as Array<[AnalystConsensus["pick"], TopAnalyst[]]>).sort(
+      (a, b) => b[1].length - a[1].length
+    );
+    const [pick, supporters] = ordered[0] ?? ["home", []];
+
+    if (supporters.length < 2) {
+      return null;
+    }
+
+    const averageConfidence = Math.round(
+      supporters.reduce((sum, analyst) => sum + analyst.confidence, 0) / supporters.length
+    );
+
+    return {
+      pick,
+      label:
+        pick === "home"
+          ? `${fixture.home} ML`
+          : pick === "away"
+            ? `${fixture.away} ML`
+            : "Draw",
+      confidence: averageConfidence,
+      supporters: supporters.length,
+    };
+  }, [fixture.away, fixture.home, topAnalysts]);
 
   const runAgentTask = useCallback(
     async (isActive: () => boolean = () => true) => {
@@ -65,6 +140,13 @@ export function AgentInsights({
               draw: poolOdds.draw.toString(),
               away: poolOdds.away.toString(),
             },
+            topAnalysts: topAnalysts.map((analyst) => ({
+              handle: analyst.handle,
+              pick: analyst.pick,
+              winRate: analyst.winRate,
+              pnl: analyst.pnl,
+              confidence: analyst.confidence,
+            })),
             communityPosts: communityPosts.map((p) => ({
               author: p.author,
               pick: p.pick,
@@ -109,7 +191,7 @@ export function AgentInsights({
         isRunningRef.current = false;
       }
     },
-    [communityPosts, fixture, poolOdds.away, poolOdds.draw, poolOdds.home]
+    [communityPosts, fixture, poolOdds.away, poolOdds.draw, poolOdds.home, topAnalysts]
   );
 
   useEffect(() => {
@@ -128,6 +210,29 @@ export function AgentInsights({
     };
   }, [isAutoMode, refreshToken, recurringIntervalMs, runAgentTask]);
 
+  useEffect(() => {
+    lastAutoExecuteKeyRef.current = null;
+  }, [fixture.id]);
+
+  useEffect(() => {
+    if (!isAutoMode || !signal || signal.signal !== "BUY" || !onExecuteSignal || !analystConsensus) {
+      return;
+    }
+
+    const signalSide = getSignalSide(signal.pick, fixture);
+    if (!signalSide || signalSide !== analystConsensus.pick) {
+      return;
+    }
+
+    const autoExecuteKey = `${fixture.id}:${signal.pick}:${analystConsensus.pick}`;
+    if (lastAutoExecuteKeyRef.current === autoExecuteKey) {
+      return;
+    }
+
+    lastAutoExecuteKeyRef.current = autoExecuteKey;
+    onExecuteSignal(signal);
+  }, [analystConsensus, fixture, isAutoMode, onExecuteSignal, signal]);
+
   const display = signal;
 
   return (
@@ -145,19 +250,33 @@ export function AgentInsights({
             flexWrap: "wrap",
             justifyContent: "flex-end",
           }}
-          >
-            <span className="slip-chip">{isAutoMode ? "Auto mode ready" : "Manual review"}</span>
-            {isAutoMode ? <span className="slip-chip slip-chip-muted">Refreshes every 90s</span> : null}
-            <button type="button" className="ghost ghost-sm" onClick={() => void runAgentTask()}>
-              {isLoading ? "Running..." : "Run Agent Task"}
-            </button>
+        >
+          <span className="slip-chip">{isAutoMode ? "Auto mode ready" : "Manual review"}</span>
+          {isAutoMode ? <span className="slip-chip slip-chip-muted">Refreshes every 90s</span> : null}
+          {analystConsensus ? (
+            <span className="slip-chip slip-chip-muted">
+              Following {analystConsensus.supporters} top analysts
+            </span>
+          ) : null}
+          <button type="button" className="ghost ghost-sm" onClick={() => void runAgentTask()}>
+            {isLoading ? "Running..." : "Run Agent Task"}
+          </button>
         </div>
       </div>
+
+      {analystConsensus ? (
+        <div className="meta-line" style={{ marginBottom: "10px" }}>
+          <span>Analyst consensus</span>
+          <strong>
+            {analystConsensus.label} · {analystConsensus.confidence}%
+          </strong>
+        </div>
+      ) : null}
 
       {isLoading ? (
         <div className="signal-loading">
           <span className="status-dot status-dot-pulse" />
-          Claude is analyzing on-chain pools and sentiment...
+          Claude is analyzing on-chain pools, analyst flow, and sentiment...
         </div>
       ) : display ? (
         <div className="signal-card">

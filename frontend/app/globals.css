@@ -1121,18 +1121,6 @@ select {
   text-underline-offset: 2px;
 }
 
-.site-footer-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface-control);
-  color: var(--muted);
-  font-size: 11px;
-  white-space: nowrap;
-}
-
 /* —— Agent signal —— */
 .signal-loading {
   padding: 20px 8px;
@@ -1254,6 +1242,14 @@ select {
 .analyst-copy span {
   color: var(--muted);
   font-size: 12px;
+}
+
+.analyst-pick {
+  color: var(--accent);
+  font-size: 11px !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .percent {
