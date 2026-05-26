@@ -9,7 +9,6 @@ import {
   useUsdtAllowance,
   usePlaceBet,
   useApproveUsdt,
-  useMintUsdt,
 } from "@/hooks/usePredictionMarket";
 import { activeXLayerChain, getSupportedConnector, getXLayerExplorerTxUrl } from "@/lib/wagmi";
 
@@ -48,7 +47,6 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
 
   const { approve, hash: approveHash, isPending: approvePending, isConfirming: approveConfirming, isSuccess: approveSuccess, error: approveError, reset: resetApprove } = useApproveUsdt();
   const { placeBet, hash: betHash, isPending: betPending, isConfirming: betConfirming, isSuccess: betSuccess, error: betError, reset: resetBet } = usePlaceBet();
-  const { mint, isPending: mintPending, isConfirming: mintConfirming, isSuccess: mintSuccess } = useMintUsdt();
 
   const selectedTeam = pick === "home" ? fixture.home : pick === "away" ? fixture.away : "Draw";
   const outcomeValue = pick === "home" ? 1 : pick === "draw" ? 2 : 3;
@@ -58,7 +56,7 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
   const currentBalanceFormatted = formatUnits(balance, 6);
 
   useEffect(() => {
-    if (approveSuccess || betSuccess || mintSuccess) {
+    if (approveSuccess || betSuccess) {
       refetchBalance();
       refetchAllowance();
       if (betSuccess) {
@@ -70,7 +68,7 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
         onBetPlaced();
       }
     }
-  }, [approveSuccess, betSuccess, mintSuccess, refetchBalance, refetchAllowance, onBetPlaced]);
+  }, [approveSuccess, betSuccess, refetchBalance, refetchAllowance, onBetPlaced]);
 
   useEffect(() => {
     if (!copyTradeRequest) return;
@@ -109,15 +107,6 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
       await connectAsync({ connector, chainId: activeXLayerChain.id });
     } catch (error) {
       console.error("Wallet connection failed", error);
-    }
-  };
-
-  const handleMint = async () => {
-    if (!address) return;
-    try {
-      await mint(address, "1000");
-    } catch (e) {
-      console.error(e);
     }
   };
 
@@ -189,8 +178,6 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
     approveConfirming ||
     betPending ||
     betConfirming ||
-    mintPending ||
-    mintConfirming ||
     waitingForConnection;
 
   const ctaLabel = !isConnected
@@ -281,14 +268,6 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
             <span>
               Balance: {parseFloat(currentBalanceFormatted).toLocaleString()} USDT
             </span>
-            <button
-              className="ghost"
-              type="button"
-              onClick={handleMint}
-              disabled={mintPending || mintConfirming}
-            >
-              {mintPending || mintConfirming ? "Minting..." : "Faucet (+1K)"}
-            </button>
           </div>
         ) : null}
 

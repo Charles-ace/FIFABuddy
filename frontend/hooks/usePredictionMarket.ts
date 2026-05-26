@@ -162,30 +162,6 @@ export function useApproveUsdt() {
   };
 }
 
-export function useMintUsdt() {
-  const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
-
-  const mint = async (toAddress: `0x${string}`, amountString: string) => {
-    const amount = parseUnits(amountString, 6);
-    return writeContractAsync({
-      address: USDT_ADDRESS,
-      abi: USDT_ABI,
-      functionName: "mint",
-      args: [toAddress, amount],
-    });
-  };
-
-  return {
-    mint,
-    hash,
-    isPending,
-    isConfirming,
-    isSuccess,
-    error,
-  };
-}
-
 export function useClaimWinnings() {
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
