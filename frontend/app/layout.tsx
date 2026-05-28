@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
-import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -19,8 +18,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FIFABuddy | X Layer Mainnet AI Copilot",
-  description: "World Cup 2026 AI prediction market, agent, and copy-trading dashboard on X Layer mainnet",
+  title: "FIFABuddy | AI Agent Hub",
+  description: "Mission control for autonomous AI agents, real-time workflows, and coordinated intelligence.",
 };
 
 export default function RootLayout({
@@ -51,7 +50,6 @@ export default function RootLayout({
           })();
         `}</Script>
         <Providers>{children}</Providers>
-        <SiteFooter />
       </body>
     </html>
   );
