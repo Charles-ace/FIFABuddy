@@ -114,7 +114,7 @@ export function CopyTrader() {
                     toggleSubscription(analyst.label);
                   }}
                   style={{
-                    padding: "4px 12px", borderRadius: 6, border: "none",
+                    padding: "4px 12px", borderRadius: 6,
                     background: isSubscribed ? "transparent" : "var(--green)",
                     color: isSubscribed ? "var(--green)" : "#080810",
                     fontWeight: 600, fontSize: 11, cursor: "pointer",
