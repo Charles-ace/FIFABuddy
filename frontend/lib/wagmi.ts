@@ -1,4 +1,4 @@
-import { injected } from "wagmi/connectors";
+import { injected } from "@wagmi/core";
 import type { EIP1193Provider } from "viem";
 import { createConfig, http } from "wagmi";
 
