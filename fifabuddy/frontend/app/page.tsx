@@ -18,6 +18,8 @@ export default function Page() {
   const [selectedFixture, setSelectedFixture] = useState<MergedFixture | null>(null);
   const [betOutcome, setBetOutcome] = useState<1 | 2 | 3 | null>(null);
   const [showCommunity, setShowCommunity] = useState<Record<string, boolean>>({});
+  const [showAllFixtures, setShowAllFixtures] = useState(false);
+  const INITIAL_SHOW = 5;
 
   const activeFixture = selectedFixture || fixtures[0];
 
@@ -43,7 +45,7 @@ export default function Page() {
 
         <div className="animate-fadeInUp" style={{ display: "flex", gap: 20 }}>
           <div style={{ flex: 1 }}>
-            {fixtures.map((fixture) => (
+            {fixtures.slice(0, showAllFixtures ? undefined : INITIAL_SHOW).map((fixture) => (
               <div key={fixture.date + fixture.team1}>
                 <FixtureCard
                   fixture={fixture}
@@ -62,6 +64,23 @@ export default function Page() {
                 )}
               </div>
             ))}
+            {fixtures.length > INITIAL_SHOW && (
+              <button
+                type="button"
+                onClick={() => setShowAllFixtures((prev) => !prev)}
+                style={{
+                  width: "100%", padding: "12px 0", borderRadius: 10,
+                  border: "1px dashed var(--border)", background: "transparent",
+                  color: "var(--muted-light)", fontSize: 13, fontWeight: 600,
+                  cursor: "pointer", transition: "all 0.2s",
+                  marginTop: 4,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--green)"; e.currentTarget.style.color = "var(--green)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--muted-light)"; }}
+              >
+                {showAllFixtures ? "Show Less" : `See ${fixtures.length - INITIAL_SHOW} More Matches`}
+              </button>
+            )}
           </div>
 
           <div style={{ width: 380, flexShrink: 0 }}>
