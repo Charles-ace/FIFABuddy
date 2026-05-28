@@ -58,13 +58,13 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
   };
 
   return (
-    <div className="animate-scaleIn" style={{
+    <div className="animate-scaleIn gradient-border" style={{
       padding: 16, borderRadius: 12,
-      background: "var(--card)", border: "1px solid var(--border)",
+      background: "var(--card)", border: "1px solid transparent",
       marginBottom: 12,
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <h3 style={{ margin: 0, fontSize: 15, color: "var(--text)" }}>Bet Slip</h3>
+        <h3 className="gradient-text-green" style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>Bet Slip</h3>
         {onClose && (
           <button type="button" onClick={onClose} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 16 }}>
             ✕
@@ -133,7 +133,7 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
         <span style={{ fontSize: 12, color: "var(--muted)" }}>Payout</span>
-        <strong style={{ fontSize: 14, color: "var(--green)" }}>
+        <strong className="gradient-text-green" style={{ fontSize: 16 }}>
           {amount} USDT
         </strong>
       </div>
@@ -166,12 +166,9 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
         type="button"
         onClick={handleAction}
         disabled={betPending || approvePending}
+        className={needsApproval ? "btn-gold" : "btn-primary"}
         style={{
-          width: "100%", padding: "12px 0", borderRadius: 8, border: "none",
-          background: !isConnected ? "var(--green)" : needsApproval ? "var(--gold)" : "var(--green)",
-          color: "#080810", fontWeight: 700, fontSize: 14,
-          cursor: "pointer", opacity: betPending || approvePending ? 0.6 : 1,
-          transition: "filter 0.2s, transform 0.2s, opacity 0.2s",
+          width: "100%", padding: "12px 0", fontSize: 14,
         }}
       >
         {!isConnected ? "Connect Wallet" : needsApproval ? "Approve USDT" : betPending ? "Placing Bet..." : `Place ${amount} USDT`}

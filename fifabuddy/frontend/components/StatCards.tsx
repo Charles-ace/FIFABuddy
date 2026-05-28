@@ -20,20 +20,27 @@ const accentColors = {
   red: "var(--red)",
 };
 
+const accentGradients = {
+  green: "linear-gradient(135deg, var(--green), #00ff88)",
+  gold: "linear-gradient(135deg, var(--gold), #ffd700)",
+  blue: "linear-gradient(135deg, var(--blue), #6db3ff)",
+  red: "linear-gradient(135deg, var(--red), #ff6b8a)",
+};
+
 export function StatCards() {
   return (
     <div style={{
       display: "grid",
       gridTemplateColumns: "repeat(4, 1fr)",
       gap: 12,
-      marginBottom: 20,
+      marginBottom: 24,
     }}>
       {stats.map((stat) => (
         <div
           key={stat.label}
           className="card-enter card-hover"
           style={{
-            padding: "16px 18px",
+            padding: "18px 20px",
             borderRadius: 12,
             background: "var(--card)",
             border: "1px solid var(--border)",
@@ -42,17 +49,24 @@ export function StatCards() {
         >
           <div style={{
             position: "absolute", top: 0, left: 0, right: 0, height: 3,
-            background: accentColors[stat.accent],
+            background: accentGradients[stat.accent],
+            backgroundSize: "200% 100%",
+            animation: "gradientShift 3s ease infinite",
           }} />
           <p style={{
-            margin: 0, fontSize: 12, color: "var(--muted)",
-            fontWeight: 500, marginBottom: 6,
+            margin: "0 0 8px", fontSize: 12, color: "var(--muted)",
+            fontWeight: 500, letterSpacing: "0.3px",
           }}>
             {stat.label}
           </p>
-          <p style={{
-            margin: 0, fontSize: 22, fontWeight: 700,
-            color: accentColors[stat.accent],
+          <p className={`animate-glowPulse`} style={{
+            margin: 0, fontSize: 24, fontWeight: 800,
+            background: accentGradients[stat.accent],
+            backgroundSize: "200% 200%",
+            animation: "gradientShift 4s ease infinite, glowPulse 2s ease-in-out infinite",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
           }}>
             {stat.value}
           </p>

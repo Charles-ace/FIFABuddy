@@ -56,7 +56,7 @@ export function Header() {
         }}>
           MM
         </div>
-        <span style={{ fontWeight: 700, fontSize: 18, color: "var(--text)" }}>FIFABuddy</span>
+        <span className="gradient-text" style={{ fontWeight: 800, fontSize: 20 }}>FIFABuddy</span>
         <div style={{
           display: "flex", alignItems: "center", gap: 4,
           padding: 3, borderRadius: 8,
@@ -97,12 +97,8 @@ export function Header() {
             <button
               type="button"
               onClick={() => window.open(FAUCET_URL, "_blank")}
-              style={{
-                padding: "8px 14px", borderRadius: 8, border: "1px solid var(--gold)",
-                background: "var(--gold-dim)", color: "var(--gold)",
-                fontWeight: 600, fontSize: 12, cursor: "pointer",
-                transition: "all 0.2s",
-              }}
+              className="btn-gold"
+              style={{ padding: "8px 14px", fontSize: 12 }}
             >
               Faucet
             </button>
@@ -112,12 +108,8 @@ export function Header() {
           <button
             type="button"
             onClick={handleToggleNetwork}
-            style={{
-              padding: "8px 16px", borderRadius: 8, border: "none",
-              background: "var(--gold)", color: "#080810",
-              fontWeight: 600, fontSize: 13, cursor: "pointer",
-              transition: "filter 0.2s, transform 0.2s",
-            }}
+            className="btn-gold"
+            style={{ padding: "8px 16px", fontSize: 13 }}
           >
             Switch Network
           </button>
@@ -142,12 +134,8 @@ export function Header() {
           <button
             type="button"
             onClick={handleConnect}
-            style={{
-              padding: "8px 20px", borderRadius: 8, border: "none",
-              background: "var(--green)", color: "#080810",
-              fontWeight: 600, fontSize: 13, cursor: "pointer",
-              transition: "filter 0.2s, transform 0.2s",
-            }}
+            className="btn-primary"
+            style={{ padding: "8px 20px", fontSize: 13 }}
           >
             Connect Wallet
           </button>

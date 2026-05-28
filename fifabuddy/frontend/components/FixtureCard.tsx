@@ -29,12 +29,12 @@ export function FixtureCard({
 
   return (
     <div
-      className={`card-enter ${active ? "animate-glow" : "card-hover"}`}
+      className={`card-enter card-hover ${active ? "animate-glowPulse gradient-border" : ""}`}
       style={{
         padding: 16,
         borderRadius: 12,
         background: "var(--card)",
-        border: active ? "1px solid var(--green)" : "1px solid var(--border)",
+        border: active ? "1px solid transparent" : "1px solid var(--border)",
         marginBottom: 12,
         transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
         cursor: "pointer",
@@ -43,7 +43,7 @@ export function FixtureCard({
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
+          <span className="gradient-text-green" style={{ fontSize: 13, fontWeight: 700 }}>
             {fixture.round}
           </span>
           {isLive && (
@@ -61,7 +61,7 @@ export function FixtureCard({
         <div style={{ flex: 1, textAlign: "left" }}>
           <strong style={{ fontSize: 15, color: "var(--text)" }}>{fixture.team1}</strong>
           {isLive && fixture.live && (
-            <span style={{ fontSize: 13, color: "var(--muted)", marginLeft: 8 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--green)", marginLeft: 8 }}>
               {fixture.live.homeGoals}
             </span>
           )}
@@ -71,7 +71,7 @@ export function FixtureCard({
         </div>
         <div style={{ flex: 1, textAlign: "right" }}>
           {isLive && fixture.live && (
-            <span style={{ fontSize: 13, color: "var(--muted)", marginRight: 8 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--green)", marginRight: 8 }}>
               {fixture.live.awayGoals}
             </span>
           )}
@@ -92,14 +92,11 @@ export function FixtureCard({
             key={label}
             type="button"
             onClick={(e) => { e.stopPropagation(); onBet?.(outcome); }}
+            className="btn-outline"
             style={{
-              padding: "8px 0", borderRadius: 8, border: "1px solid var(--border)",
-              background: "transparent", color: "var(--text)",
-              fontWeight: 600, fontSize: 13, cursor: "pointer",
-              transition: "border-color 0.2s, background 0.2s",
+              padding: "8px 0", fontSize: 13, fontWeight: 700,
+              transition: "all 0.2s",
             }}
-            onMouseEnter={(e) => { const t = e.currentTarget; t.style.borderColor = "var(--green)"; t.style.background = t.style.background = "var(--green-dim)"; }}
-            onMouseLeave={(e) => { const t = e.currentTarget; t.style.borderColor = "var(--border)"; t.style.background = "transparent"; }}
           >
             {label} {odds ? `${formatOdds(odds[outcome === 1 ? "home" : outcome === 2 ? "draw" : "away"])}` : "-"}
           </button>
@@ -107,9 +104,9 @@ export function FixtureCard({
       </div>
 
       <div style={{ display: "flex", height: 6, borderRadius: 3, overflow: "hidden", marginBottom: 8 }}>
-        <div style={{ flex: homePct, background: "var(--green)" }} />
+        <div style={{ flex: homePct, background: "linear-gradient(135deg, var(--green), #00ff88)" }} />
         <div style={{ flex: drawPct, background: "var(--muted-light)" }} />
-        <div style={{ flex: awayPct, background: "var(--blue)" }} />
+        <div style={{ flex: awayPct, background: "linear-gradient(135deg, var(--blue), #6db3ff)" }} />
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -119,11 +116,11 @@ export function FixtureCard({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onToggleCommunity?.(); }}
+          className="btn-outline"
           style={{
-            fontSize: 11, padding: "4px 10px", borderRadius: 6,
-            border: "1px solid var(--border)", background: "transparent",
-            color: communityOpen ? "var(--green)" : "var(--muted)",
-            cursor: "pointer",
+            fontSize: 11, padding: "4px 10px",
+            color: communityOpen ? "var(--green)" : undefined,
+            borderColor: communityOpen ? "var(--green)" : undefined,
           }}
         >
           {communityOpen ? "Hide Community" : "Show Community"}

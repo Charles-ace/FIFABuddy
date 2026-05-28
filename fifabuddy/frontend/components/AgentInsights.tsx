@@ -6,6 +6,7 @@ type Props = {
   fixture: { team1: string; team2: string; date: string };
   poolOdds: { home: bigint; draw: bigint; away: bigint };
   communityPosts?: { author: string; text: string; pick: string; upvotes: string }[];
+  onBet?: (fixture: { team1: string; team2: string; date: string }, outcome: 1 | 2 | 3) => void;
 };
 
 type Signal = {
@@ -21,13 +22,15 @@ const signalColors = {
   AVOID: { bg: "rgba(255,77,109,0.12)", text: "var(--red)" },
 };
 
-export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
+export function AgentInsights({ fixture, poolOdds, communityPosts, onBet }: Props) {
   const [signal, setSignal] = useState<Signal | null>(null);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<Signal[]>([]);
+  const [error, setError] = useState(false);
 
   const fetchSignal = useCallback(async () => {
     setLoading(true);
+    setError(false);
     try {
       const res = await fetch("/api/agent", {
         method: "POST",
@@ -43,10 +46,12 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
         }),
       });
       const data = await res.json();
+      if (!res.ok) { setError(true); return; }
       setSignal(data);
       setHistory((prev) => [data, ...prev].slice(0, 10));
     } catch (e) {
       console.error("Agent signal fetch failed", e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -56,26 +61,32 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
 
   const colors = signal ? signalColors[signal.signal] : signalColors.HOLD;
 
+  const pickToOutcome = (pick: string): 1 | 2 | 3 => {
+    const lower = pick.toLowerCase();
+    if (lower.includes(fixture.team1.toLowerCase()) || lower === "home" || lower === "1") return 1;
+    if (lower.includes(fixture.team2.toLowerCase()) || lower === "away" || lower === "3") return 3;
+    return 2;
+  };
+
+  const hasValidPick = signal && fixture.team1 && fixture.team2 && signal.pick;
+
   return (
-    <div className="card-enter card-hover" style={{
+    <div className="card-enter gradient-border" style={{
       padding: 16, borderRadius: 12,
-      background: "var(--card)", border: "1px solid var(--border)",
+      background: "var(--card)", border: "1px solid transparent",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <h3 style={{ margin: 0, fontSize: 15, color: "var(--text)" }}>
+        <h3 className="gradient-text-green" style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>
           FIFABuddy AI
         </h3>
         <button
           type="button"
           onClick={fetchSignal}
           disabled={loading}
-          style={{
-            padding: "4px 12px", borderRadius: 6, border: "1px solid var(--border)",
-            background: "transparent", color: "var(--muted)", fontSize: 11,
-            cursor: "pointer", transition: "border-color 0.2s, color 0.2s",
-          }}
+          className="btn-outline"
+          style={{ padding: "4px 12px", fontSize: 11 }}
         >
-            {loading ? "Thinking..." : "Refresh"}
+          {loading ? "Thinking..." : "Refresh"}
         </button>
       </div>
 
@@ -90,6 +101,17 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
         </div>
       )}
 
+      {error && !signal && !loading && (
+        <div style={{ padding: "16px 0", textAlign: "center" }}>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 8px" }}>
+            No API key configured. Set <code style={{ background: "rgba(255,255,255,0.05)", padding: "1px 4px", borderRadius: 3 }}>ANTHROPIC_API_KEY</code> to get AI signals.
+          </p>
+          <p style={{ fontSize: 11, color: "var(--muted)", margin: 0 }}>
+            AI agent will analyse pool odds and community sentiment.
+          </p>
+        </div>
+      )}
+
       {signal && (
         <div style={{
           padding: 12, borderRadius: 8,
@@ -97,12 +119,10 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
           marginBottom: 12,
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{
-              fontSize: 16, fontWeight: 700, color: colors.text,
-            }}>
+            <span style={{ fontSize: 18, fontWeight: 800, color: colors.text }}>
               {signal.signal}
             </span>
-            <span style={{ fontSize: 20, fontWeight: 700, color: colors.text }}>
+            <span style={{ fontSize: 22, fontWeight: 800, color: colors.text }}>
               {signal.confidence}%
             </span>
           </div>
@@ -111,9 +131,10 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
             height: 6, borderRadius: 3, background: "rgba(255,255,255,0.1)",
             marginBottom: 8, overflow: "hidden",
           }}>
-            <div style={{
+            <div className="confidence-bar" style={{
               width: `${signal.confidence}%`, height: "100%",
-              background: colors.text, borderRadius: 3,
+              background: `linear-gradient(90deg, ${colors.text}, ${colors.text})`,
+              borderRadius: 3,
             }} />
           </div>
 
@@ -122,6 +143,25 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
           </p>
           <p style={{ fontSize: 12, color: "var(--muted)", margin: 0 }}>
             {signal.reasoning}
+          </p>
+
+          {hasValidPick && onBet && (
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ width: "100%", padding: "8px 0", fontSize: 12, marginTop: 10 }}
+              onClick={() => onBet(fixture, pickToOutcome(signal.pick))}
+            >
+              Place Bet on {signal.pick}
+            </button>
+          )}
+        </div>
+      )}
+
+      {!signal && !loading && !error && (
+        <div style={{ padding: "16px 0", textAlign: "center" }}>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: 0 }}>
+            Select a match to see AI predictions.
           </p>
         </div>
       )}
