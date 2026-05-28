@@ -83,7 +83,7 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
             type="button"
             onClick={() => setPick(v as 1 | 2 | 3)}
             style={{
-              flex: 1, padding: "8px 0", borderRadius: 8, border: "none",
+              flex: 1, padding: "8px 0", borderRadius: 8,
               background: pick === v ? "var(--green-dim)" : "transparent",
               border: pick === v ? "1px solid var(--green)" : "1px solid var(--border)",
               color: pick === v ? "var(--green)" : "var(--muted)",
