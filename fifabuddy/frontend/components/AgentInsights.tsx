@@ -25,7 +25,6 @@ const signalColors = {
 export function AgentInsights({ fixture, poolOdds, communityPosts, onBet }: Props) {
   const [signal, setSignal] = useState<Signal | null>(null);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<Signal[]>([]);
   const [error, setError] = useState(false);
 
   const fetchSignal = useCallback(async () => {
@@ -43,7 +42,6 @@ export function AgentInsights({ fixture, poolOdds, communityPosts, onBet }: Prop
       if (!res.ok) { setError(true); return; }
       const data = await res.json();
       setSignal(data);
-      setHistory((prev) => [data, ...prev].slice(0, 10));
     } catch { setError(true); } finally { setLoading(false); }
   }, [fixture, poolOdds, communityPosts]);
 
@@ -177,39 +175,7 @@ export function AgentInsights({ fixture, poolOdds, communityPosts, onBet }: Prop
         </div>
       )}
 
-      {/* History */}
-      {history.length > 0 && (
-        <div>
-          <p style={{
-            fontSize: 10, color: "var(--text-muted)", margin: "0 0 8px", fontWeight: 600,
-            fontFamily: "var(--font-display)", letterSpacing: "0.5px",
-          }}>
-            Signal History
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {history.map((h, i) => {
-              const c = signalColors[h.signal];
-              return (
-                <div key={i} style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  padding: "6px 10px", borderRadius: 6,
-                  background: c.bg, fontSize: 11,
-                }}>
-                  <span style={{ fontWeight: 700, color: c.text, minWidth: 36, fontFamily: "var(--font-display)" }}>
-                    {h.signal}
-                  </span>
-                  <span style={{ color: c.text, fontWeight: 700, fontFamily: "var(--font-display)" }}>
-                    {h.confidence}%
-                  </span>
-                  <span style={{ color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {h.pick}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
