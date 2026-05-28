@@ -95,19 +95,16 @@ export function AgentInsights({ fixture, poolOdds, communityPosts, onBet }: Prop
             margin: "0 auto 8px",
           }} />
           <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-display)" }}>
-            Claude is analysing...
+            Analysing match data...
           </span>
         </div>
       )}
 
-      {/* Error / No key */}
+      {/* Error */}
       {error && !signal && !loading && (
         <div style={{ padding: "16px 0", textAlign: "center" }}>
-          <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 8px", fontFamily: "var(--font-display)" }}>
-            Set <code style={{ background: "rgba(255,255,255,0.04)", padding: "1px 5px", borderRadius: 3 }}>ANTHROPIC_API_KEY</code> for AI signals.
-          </p>
-          <p style={{ fontSize: 10, color: "var(--text-dim)", margin: 0 }}>
-            AI analyses pool odds and community sentiment.
+          <p style={{ fontSize: 11, color: "var(--text-muted)", margin: 0, fontFamily: "var(--font-display)" }}>
+            Unable to load signal. Pull to refresh.
           </p>
         </div>
       )}
