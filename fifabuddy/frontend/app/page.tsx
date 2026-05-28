@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
-import { Header } from "@/components/Header";
+import { Navbar } from "@/components/Navbar";
+import { Sidebar } from "@/components/Sidebar";
+import { RightPanel } from "@/components/RightPanel";
+import { HeroMatch } from "@/components/HeroMatch";
+import { MatchTable } from "@/components/MatchTable";
+import { LeagueCards } from "@/components/LeagueCards";
+import { PredictorCards } from "@/components/PredictorCards";
 import { StatCards } from "@/components/StatCards";
 import { FixtureCard } from "@/components/FixtureCard";
 import { BetSlip } from "@/components/BetSlip";
@@ -74,111 +80,95 @@ export default function Page() {
   const hiddenCount = fixtures.length - INITIAL_SHOW;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
+    <div className="sportsbook-layout" style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
       <div className="scan-overlay" />
-      <Header />
 
-      <main className="container" style={{ paddingTop: 20, paddingBottom: 60 }}>
+      {/* ═══ LEFT SIDEBAR ═══ */}
+      <Sidebar />
 
-        {/* ═══ HERO ═══ */}
-        <section className="hero">
-          <h1 className="gradient-text">AI Football Prediction Terminal</h1>
-          <p>
-            Real-time match intelligence powered by AI. Analyse. Predict. Earn.
-          </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 28, flexWrap: "wrap" }}>
-            <button className="btn-primary" style={{ padding: "12px 28px", fontSize: 13 }}>
-              Start Predicting
-            </button>
-            <button className="btn-outline" style={{ padding: "12px 28px", fontSize: 13 }}>
-              View Analytics
-            </button>
-          </div>
-          <div className="hero-stats">
-            {[
-              { v: "12", l: "Markets Open" },
-              { v: "$1.2M", l: "Total Pool" },
-              { v: "89%", l: "AI Accuracy" },
-              { v: "2.4K", l: "Active Traders" },
-            ].map((s, i) => (
-              <div key={s.l} className="hero-stat" style={{
-                animation: `fadeUp 0.4s ease ${0.2 + i * 0.08}s forwards`,
-                opacity: 0,
-              }}>
-                <div className="hero-stat-value">{s.v}</div>
-                <div className="hero-stat-label">{s.l}</div>
+      {/* ═══ MAIN CONTENT ═══ */}
+      <div style={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+        <Navbar />
+
+        <main style={{
+          flex: 1, overflowY: "auto", padding: "12px 16px 40px",
+          display: "flex", gap: 16,
+        }}>
+          {/* ─── Center Column ─── */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Hero Match */}
+            <HeroMatch fixture={activeFixture} odds={odds ?? undefined} />
+
+            {/* Ticker */}
+            <div className="ticker-wrap" style={{ marginBottom: 14 }}>
+              <div className="ticker-track">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} style={{ display: "inline-flex", gap: 56 }}>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--green)" }} /> Brazil <span className="ticker-up">+3.2%</span></span>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--blue)" }} /> France <span className="ticker-up">+1.8%</span></span>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--green)" }} /> Argentina <span className="ticker-up">+4.1%</span></span>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--gold)" }} /> Portugal <span className="ticker-up">+0.5%</span></span>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--red)" }} /> Germany <span className="ticker-down">-1.2%</span></span>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--blue)" }} /> Spain <span className="ticker-up">+2.4%</span></span>
+                    <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--green)" }} /> England <span className="ticker-up">+3.7%</span></span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
 
-        {/* ═══ TICKER ═══ */}
-        <div className="ticker-wrap">
-          <div className="ticker-track">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} style={{ display: "inline-flex", gap: 56 }}>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--green)" }} /> Brazil <span className="ticker-up">+3.2%</span></span>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--blue)" }} /> France <span className="ticker-up">+1.8%</span></span>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--green)" }} /> Argentina <span className="ticker-up">+4.1%</span></span>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--gold)" }} /> Portugal <span className="ticker-up">+0.5%</span></span>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--red)" }} /> Germany <span className="ticker-down">-1.2%</span></span>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--blue)" }} /> Spain <span className="ticker-up">+2.4%</span></span>
-                <span className="ticker-item"><span className="ticker-dot" style={{ background: "var(--green)" }} /> England <span className="ticker-up">+3.7%</span></span>
-              </div>
-            ))}
-          </div>
-        </div>
+            {/* League Cards Row */}
+            <LeagueCards />
 
-        {/* ═══ LEAGUES ═══ */}
-        <FeaturedLeagues />
+            {/* Stats */}
+            <StatCards />
 
-        {/* ═══ STATS + MAIN LAYOUT ═══ */}
-        <StatCards />
-
-        <div style={{ display: "flex", gap: 20 }}>
-          {/* ─── Fixtures ─── */}
-          <div style={{ flex: 1 }}>
+            {/* Matches Table */}
+            <div className="section-label">Live & Upcoming Matches</div>
             {loading ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="skeleton" style={{ height: 130, width: "100%" }} />
+                  <div key={i} className="skeleton" style={{ height: 48, width: "100%" }} />
                 ))}
               </div>
             ) : (
               <>
-                {visibleFixtures.map((fixture, i) => (
-                  <div
-                    key={fixture.date + fixture.team1}
-                    style={{
-                      animation: `fadeUp 0.4s ease ${i * 0.06}s forwards`,
-                      opacity: 0,
-                    }}
-                  >
-                    <FixtureCard
-                      fixture={fixture}
-                      active={activeFixture?.date === fixture.date && activeFixture?.team1 === fixture.team1}
-                      onSelect={() => setSelectedFixture(fixture)}
-                      onBet={(outcome) => handleBet(fixture, outcome)}
-                      odds={odds}
-                      onToggleCommunity={() => setShowCommunity((prev) => ({ ...prev, [fixture.date.replace(/-/g, "")]: !prev[fixture.date.replace(/-/g, "")] }))}
-                      communityOpen={showCommunity[fixture.date.replace(/-/g, "")]}
-                    />
-                    {showCommunity[fixture.date.replace(/-/g, "")] && (
-                      <CommunityPanel
-                        matchId={BigInt(fixture.date.replace(/-/g, ""))}
-                        posts={communityPosts}
+                {/* Table view */}
+                <div style={{ marginBottom: 12 }}>
+                  <MatchTable fixtures={visibleFixtures} odds={odds ?? undefined} onBet={handleBet} />
+                </div>
+
+                {/* Card view (legacy, for community toggle per match) */}
+                {visibleFixtures.map((fixture, i) => {
+                  const matchKey = fixture.date.replace(/-/g, "");
+                  return (
+                    <div key={fixture.date + fixture.team1} style={{ display: showCommunity[matchKey] ? "block" : "none" }}>
+                      <FixtureCard
+                        fixture={fixture}
+                        active={activeFixture?.date === fixture.date && activeFixture?.team1 === fixture.team1}
+                        onSelect={() => setSelectedFixture(fixture)}
+                        onBet={(outcome) => handleBet(fixture, outcome)}
+                        odds={odds}
+                        onToggleCommunity={() => setShowCommunity((prev) => ({ ...prev, [matchKey]: !prev[matchKey] }))}
+                        communityOpen={showCommunity[matchKey]}
                       />
-                    )}
-                  </div>
-                ))}
+                      {showCommunity[matchKey] && (
+                        <CommunityPanel
+                          matchId={BigInt(matchKey)}
+                          posts={communityPosts}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+
                 {hiddenCount > 0 && (
                   <button
                     type="button"
                     onClick={() => setShowAllFixtures((prev) => !prev)}
                     className={showAllFixtures ? "btn-outline" : "btn-primary"}
                     style={{
-                      width: "100%", padding: "12px 0", fontSize: 12,
-                      fontFamily: "var(--font-display)", marginTop: 4,
+                      width: "100%", padding: "10px 0", fontSize: 12,
+                      fontFamily: "var(--font-display)", marginTop: 4, marginBottom: 16,
                     }}
                   >
                     {showAllFixtures ? "Show Less" : `See ${hiddenCount} More Matches`}
@@ -186,218 +176,214 @@ export default function Page() {
                 )}
               </>
             )}
-          </div>
 
-          {/* ─── Sidebar ─── */}
-          <div style={{ width: 380, flexShrink: 0 }}>
-            <div style={{ position: "sticky", top: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-              {betOutcome && activeFixture && (
+            {/* Bet Slip */}
+            {betOutcome && activeFixture && (
+              <div style={{ marginBottom: 16 }}>
                 <BetSlip
                   fixture={activeFixture}
                   outcome={betOutcome}
                   onBetPlaced={() => setBetOutcome(null)}
                   onClose={() => setBetOutcome(null)}
                 />
-              )}
-              <AgentInsights
-                fixture={activeFixture || { team1: "", team2: "", date: "" }}
-                poolOdds={odds}
-                onBet={handleAgentBet}
+              </div>
+            )}
+
+            {/* Predictors */}
+            <PredictorCards />
+
+            {/* Leaderboard */}
+            <div style={{ marginTop: 24 }}>
+              <SectionHeader
+                label="Community"
+                title="Top Predictors"
+                desc="See who's winning. Climb the ranks."
               />
-              <CopyTrader />
+              <LeaderboardPreview />
             </div>
-          </div>
-        </div>
 
-        {/* ═══ LEADERBOARD ═══ */}
-        <div style={{ marginTop: 48 }}>
-          <SectionHeader
-            label="Community"
-            title="Top Predictors"
-            desc="See who's winning. Climb the ranks."
-          />
-          <div style={{ maxWidth: 500 }}>
-            <LeaderboardPreview />
-          </div>
-        </div>
-
-        {/* ═══ TESTIMONIALS ═══ */}
-        <div style={{ marginTop: 60 }}>
-          <SectionHeader
-            label="Testimonials"
-            title="Trusted by Analysts"
-            desc="Hear from the FIFABuddy community."
-            align="center"
-          />
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-          }}>
-            {testimonials.map((t, i) => (
-              <div
-                key={t.name}
-                className="glass-card"
-                style={{
-                  padding: 20,
-                  animation: `fadeUp 0.4s ease ${i * 0.08}s forwards`,
-                  opacity: 0,
-                }}
-              >
-                <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>
-                  {[...Array(t.rating)].map((_, j) => (
-                    <span key={j} style={{ color: "var(--gold)", fontSize: 13 }}>★</span>
-                  ))}
-                </div>
-                <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 12 }}>
-                  &ldquo;{t.text}&rdquo;
-                </p>
-                <div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-display)" }}>
-                    {t.name}
-                  </span>
-                  <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 6 }}>
-                    {t.role}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ═══ PRICING ═══ */}
-        <div style={{ marginTop: 60 }}>
-          <SectionHeader
-            label="Pricing"
-            title="Choose Your Plan"
-            desc="Scale from casual fan to elite analyst."
-            align="center"
-          />
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-            maxWidth: 900, margin: "0 auto",
-          }}>
-            {plans.map((plan, i) => (
-              <div
-                key={plan.name}
-                className={plan.popular ? "border-glow-green" : "glass-card"}
-                style={{
-                  padding: 24, borderRadius: 12,
-                  background: "var(--bg-card)",
-                  border: plan.popular ? "1px solid transparent" : "1px solid var(--border-subtle)",
-                  position: "relative",
-                  animation: `fadeUp 0.4s ease ${0.1 + i * 0.06}s forwards`,
-                  opacity: 0,
-                }}
-              >
-                {plan.popular && (
-                  <div style={{
-                    position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
-                    padding: "3px 14px", borderRadius: 20,
-                    background: "linear-gradient(135deg, var(--green), var(--emerald))",
-                    fontSize: 10, fontWeight: 700, color: "#06060e",
-                    fontFamily: "var(--font-display)",
-                    whiteSpace: "nowrap",
-                  }}>
-                    Most Popular
-                  </div>
-                )}
-                <h3 style={{
-                  fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700,
-                  color: "var(--text-primary)", marginBottom: 4,
-                }}>
-                  {plan.name}
-                </h3>
-                <p style={{
-                  fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 800,
-                  background: plan.popular
-                    ? "linear-gradient(135deg, var(--green), var(--green-bright))"
-                    : "linear-gradient(135deg, var(--text-primary), var(--text-secondary))",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  marginBottom: 16,
-                }}>
-                  {plan.price}
-                </p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-                  {plan.features.map((f) => (
-                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ color: "var(--green)", fontSize: 12 }}>✓</span>
-                      <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{f}</span>
+            {/* Testimonials */}
+            <div style={{ marginTop: 48 }}>
+              <SectionHeader
+                label="Testimonials"
+                title="Trusted by Analysts"
+                desc="Hear from the FIFABuddy community."
+                align="center"
+              />
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 16,
+              }}>
+                {testimonials.map((t, i) => (
+                  <div
+                    key={t.name}
+                    className="glass-card"
+                    style={{
+                      padding: 20,
+                      animation: `fadeUp 0.4s ease ${i * 0.08}s forwards`,
+                      opacity: 0,
+                    }}
+                  >
+                    <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>
+                      {[...Array(t.rating)].map((_, j) => (
+                        <span key={j} style={{ color: "var(--gold)", fontSize: 13 }}>★</span>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <button
-                  className={plan.popular ? "btn-primary" : "btn-outline"}
-                  style={{ width: "100%", padding: "10px 0", fontSize: 12, fontFamily: "var(--font-display)" }}
-                >
-                  {plan.name === "Starter" ? "Get Started" : "Subscribe"}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ═══ FAQ ═══ */}
-        <div style={{ marginTop: 60 }}>
-          <SectionHeader
-            label="FAQ"
-            title="Frequently Asked Questions"
-            desc="Everything you need to know."
-            align="center"
-          />
-          <div style={{ maxWidth: 640, margin: "0 auto" }}>
-            {faqs.map((faq, i) => (
-              <div
-                key={i}
-                className="glass-card"
-                style={{
-                  marginBottom: 8, overflow: "hidden",
-                  cursor: "pointer",
-                  animation: `fadeUp 0.3s ease ${0.1 + i * 0.04}s forwards`,
-                  opacity: 0,
-                }}
-                onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-              >
-                <div style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  padding: "14px 16px",
-                }}>
-                  <span style={{
-                    fontSize: 13, fontWeight: 600, color: "var(--text-primary)",
-                    fontFamily: "var(--font-display)",
-                  }}>
-                    {faq.q}
-                  </span>
-                  <span style={{
-                    fontSize: 14, color: "var(--green)", transition: "transform 0.3s",
-                    transform: expandedFaq === i ? "rotate(45deg)" : "rotate(0deg)",
-                    display: "inline-block",
-                  }}>
-                    +
-                  </span>
-                </div>
-                {expandedFaq === i && (
-                  <div style={{
-                    padding: "0 16px 14px",
-                    animation: "slideUp 0.3s ease forwards",
-                  }}>
-                    <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
-                      {faq.a}
+                    <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 12 }}>
+                      &ldquo;{t.text}&rdquo;
                     </p>
+                    <div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-display)" }}>
+                        {t.name}
+                      </span>
+                      <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 6 }}>
+                        {t.role}
+                      </span>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Pricing */}
+            <div style={{ marginTop: 48 }}>
+              <SectionHeader
+                label="Pricing"
+                title="Choose Your Plan"
+                desc="Scale from casual fan to elite analyst."
+                align="center"
+              />
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 16,
+                maxWidth: 900, margin: "0 auto",
+              }}>
+                {plans.map((plan, i) => (
+                  <div
+                    key={plan.name}
+                    className={plan.popular ? "border-glow-green" : "glass-card"}
+                    style={{
+                      padding: 24, borderRadius: 12,
+                      background: "var(--bg-card)",
+                      border: plan.popular ? "1px solid transparent" : "1px solid var(--border-subtle)",
+                      position: "relative",
+                      animation: `fadeUp 0.4s ease ${0.1 + i * 0.06}s forwards`,
+                      opacity: 0,
+                    }}
+                  >
+                    {plan.popular && (
+                      <div style={{
+                        position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
+                        padding: "3px 14px", borderRadius: 20,
+                        background: "linear-gradient(135deg, var(--green), var(--emerald))",
+                        fontSize: 10, fontWeight: 700, color: "#06060e",
+                        fontFamily: "var(--font-display)",
+                        whiteSpace: "nowrap",
+                      }}>
+                        Most Popular
+                      </div>
+                    )}
+                    <h3 style={{
+                      fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700,
+                      color: "var(--text-primary)", marginBottom: 4,
+                    }}>
+                      {plan.name}
+                    </h3>
+                    <p style={{
+                      fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 800,
+                      background: plan.popular
+                        ? "linear-gradient(135deg, var(--green), var(--green-bright))"
+                        : "linear-gradient(135deg, var(--text-primary), var(--text-secondary))",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      marginBottom: 16,
+                    }}>
+                      {plan.price}
+                    </p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+                      {plan.features.map((f) => (
+                        <div key={f} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ color: "var(--green)", fontSize: 12 }}>✓</span>
+                          <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      className={plan.popular ? "btn-primary" : "btn-outline"}
+                      style={{ width: "100%", padding: "10px 0", fontSize: 12, fontFamily: "var(--font-display)" }}
+                    >
+                      {plan.name === "Starter" ? "Get Started" : "Subscribe"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* FAQ */}
+            <div style={{ marginTop: 48 }}>
+              <SectionHeader
+                label="FAQ"
+                title="Frequently Asked Questions"
+                desc="Everything you need to know."
+                align="center"
+              />
+              <div style={{ maxWidth: 640, margin: "0 auto" }}>
+                {faqs.map((faq, i) => (
+                  <div
+                    key={i}
+                    className="glass-card"
+                    style={{
+                      marginBottom: 8, overflow: "hidden",
+                      cursor: "pointer",
+                      animation: `fadeUp 0.3s ease ${0.1 + i * 0.04}s forwards`,
+                      opacity: 0,
+                    }}
+                    onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+                  >
+                    <div style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "14px 16px",
+                    }}>
+                      <span style={{
+                        fontSize: 13, fontWeight: 600, color: "var(--text-primary)",
+                        fontFamily: "var(--font-display)",
+                      }}>
+                        {faq.q}
+                      </span>
+                      <span style={{
+                        fontSize: 14, color: "var(--green)", transition: "transform 0.3s",
+                        transform: expandedFaq === i ? "rotate(45deg)" : "rotate(0deg)",
+                        display: "inline-block",
+                      }}>
+                        +
+                      </span>
+                    </div>
+                    {expandedFaq === i && (
+                      <div style={{
+                        padding: "0 16px 14px",
+                        animation: "slideUp 0.3s ease forwards",
+                      }}>
+                        <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
+                          {faq.a}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <Footer />
           </div>
-        </div>
 
-      </main>
-
-      <Footer />
+          {/* ─── Right Column ─── */}
+          <RightPanel />
+        </main>
+      </div>
     </div>
   );
 }
