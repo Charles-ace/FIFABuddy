@@ -57,25 +57,38 @@ export function Header() {
           MM
         </div>
         <span style={{ fontWeight: 700, fontSize: 18, color: "var(--text)" }}>FIFABuddy</span>
-        <button
-          type="button"
-          onClick={handleToggleNetwork}
-          style={{
-            fontSize: 11, padding: "2px 8px", borderRadius: 4,
-            background: isMainnet ? "var(--green-dim)" : "var(--blue-dim)",
-            color: isMainnet ? "var(--green)" : "var(--blue)",
-            fontWeight: 600, letterSpacing: "0.3px",
-            border: "none", cursor: "pointer", transition: "all 0.2s",
-            display: "flex", alignItems: "center", gap: 4,
-          }}
-        >
-          <span className="animate-liveDot" style={{
-            width: 4, height: 4, borderRadius: "50%",
-            background: isMainnet ? "var(--green)" : "var(--blue)",
-            display: "inline-block",
-          }} />
-          {isMainnet ? "X Layer Mainnet" : "X Layer Testnet"}
-        </button>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 4,
+          padding: 3, borderRadius: 8,
+          background: "rgba(255,255,255,0.04)",
+        }}>
+          <button
+            type="button"
+            onClick={() => { if (isMainnet) handleToggleNetwork(); }}
+            style={{
+              padding: "3px 10px", borderRadius: 5, border: "none",
+              background: isTestnet ? "var(--blue-dim)" : "transparent",
+              color: isTestnet ? "var(--blue)" : "var(--muted)",
+              fontWeight: 600, fontSize: 11, cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+          >
+            Testnet
+          </button>
+          <button
+            type="button"
+            onClick={() => { if (isTestnet) handleToggleNetwork(); }}
+            style={{
+              padding: "3px 10px", borderRadius: 5, border: "none",
+              background: isMainnet ? "var(--green-dim)" : "transparent",
+              color: isMainnet ? "var(--green)" : "var(--muted)",
+              fontWeight: 600, fontSize: 11, cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+          >
+            Mainnet
+          </button>
+        </div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
