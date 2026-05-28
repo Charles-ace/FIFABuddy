@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "World Cup 2026 prediction market and AI agent dashboard on X Layer",
 };
 
-const ClientProviders = dynamic(() => import("./providers").then((m) => m.Providers), {
+const ClientProviders = dynamicImport(() => import("./providers").then((m) => m.Providers), {
   ssr: false,
 });
 
