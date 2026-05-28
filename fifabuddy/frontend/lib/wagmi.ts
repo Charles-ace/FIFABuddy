@@ -1,5 +1,5 @@
 import { createConfig, http } from "wagmi";
-import { injected, walletConnect } from "wagmi/connectors";
+import { injected } from "wagmi/connectors";
 import type { Chain } from "viem";
 
 export const xlayerTestnet = {
@@ -20,7 +20,6 @@ export const wagmiConfig = createConfig({
   chains: [xlayerTestnet],
   connectors: [
     injected(),
-    walletConnect({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID! }),
   ],
   transports: {
     [xlayerTestnet.id]: http("https://testrpc.xlayer.tech"),
