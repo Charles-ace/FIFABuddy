@@ -31,13 +31,19 @@ export function StatCards() {
       {stats.map((stat) => (
         <div
           key={stat.label}
+          className="card-enter card-hover"
           style={{
             padding: "16px 18px",
             borderRadius: 12,
             background: "var(--card)",
             border: "1px solid var(--border)",
+            position: "relative", overflow: "hidden",
           }}
         >
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, height: 3,
+            background: accentColors[stat.accent],
+          }} />
           <p style={{
             margin: 0, fontSize: 12, color: "var(--muted)",
             fontWeight: 500, marginBottom: 6,

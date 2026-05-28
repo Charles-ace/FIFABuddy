@@ -29,13 +29,14 @@ export function FixtureCard({
 
   return (
     <div
+      className={`card-enter ${active ? "animate-glow" : "card-hover"}`}
       style={{
         padding: 16,
         borderRadius: 12,
         background: "var(--card)",
         border: active ? "1px solid var(--green)" : "1px solid var(--border)",
         marginBottom: 12,
-        transition: "border-color 0.2s",
+        transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
         cursor: "pointer",
       }}
       onClick={onSelect}
@@ -46,10 +47,7 @@ export function FixtureCard({
             {fixture.round}
           </span>
           {isLive && (
-            <span style={{
-              fontSize: 10, padding: "2px 6px", borderRadius: 4,
-              background: "var(--red)", color: "#fff", fontWeight: 700,
-            }}>
+            <span className="live-badge">
               LIVE {fixture.live?.minute}'
             </span>
           )}
@@ -98,7 +96,10 @@ export function FixtureCard({
               padding: "8px 0", borderRadius: 8, border: "1px solid var(--border)",
               background: "transparent", color: "var(--text)",
               fontWeight: 600, fontSize: 13, cursor: "pointer",
+              transition: "border-color 0.2s, background 0.2s",
             }}
+            onMouseEnter={(e) => { const t = e.currentTarget; t.style.borderColor = "var(--green)"; t.style.background = t.style.background = "var(--green-dim)"; }}
+            onMouseLeave={(e) => { const t = e.currentTarget; t.style.borderColor = "var(--border)"; t.style.background = "transparent"; }}
           >
             {label} {odds ? `${formatOdds(odds[outcome === 1 ? "home" : outcome === 2 ? "draw" : "away"])}` : "-"}
           </button>

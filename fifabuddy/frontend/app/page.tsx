@@ -8,6 +8,7 @@ import { FixtureCard } from "@/components/FixtureCard";
 import { BetSlip } from "@/components/BetSlip";
 import { CommunityPanel } from "@/components/CommunityPanel";
 import { AgentInsights } from "@/components/AgentInsights";
+import { CopyTrader } from "@/components/CopyTrader";
 import { getMergedFixtures, type MergedFixture } from "@/lib/football";
 import { useOdds } from "@/hooks/usePredictionMarket";
 
@@ -37,10 +38,10 @@ export default function Page() {
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Header />
 
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "20px 24px" }}>
+      <main className="animate-fadeIn" style={{ maxWidth: 1280, margin: "0 auto", padding: "20px 24px" }}>
         <StatCards />
 
-        <div style={{ display: "flex", gap: 20 }}>
+        <div className="animate-fadeInUp" style={{ display: "flex", gap: 20 }}>
           <div style={{ flex: 1 }}>
             {fixtures.map((fixture) => (
               <div key={fixture.date + fixture.team1}>
@@ -77,6 +78,7 @@ export default function Page() {
                 fixture={activeFixture || { team1: "", team2: "", date: "" }}
                 poolOdds={odds}
               />
+              <CopyTrader />
             </div>
           </div>
         </div>

@@ -58,7 +58,7 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
   };
 
   return (
-    <div style={{
+    <div className="animate-scaleIn" style={{
       padding: 16, borderRadius: 12,
       background: "var(--card)", border: "1px solid var(--border)",
       marginBottom: 12,
@@ -77,7 +77,7 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
       </div>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-        {[{ v: 1, l: fixture.team1 }, { v: 2, l: "Draw" }, { v: 3, l: fixture.team2 }].map(({ v, l }) => (
+        {        [{ v: 1, l: fixture.team1 }, { v: 2, l: "Draw" }, { v: 3, l: fixture.team2 }].map(({ v, l }) => (
           <button
             key={v}
             type="button"
@@ -88,6 +88,7 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
               border: pick === v ? "1px solid var(--green)" : "1px solid var(--border)",
               color: pick === v ? "var(--green)" : "var(--muted)",
               fontWeight: 600, fontSize: 11, cursor: "pointer",
+              transition: "all 0.2s",
             }}
           >
             {l}
@@ -170,6 +171,7 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
           background: !isConnected ? "var(--green)" : needsApproval ? "var(--gold)" : "var(--green)",
           color: "#080810", fontWeight: 700, fontSize: 14,
           cursor: "pointer", opacity: betPending || approvePending ? 0.6 : 1,
+          transition: "filter 0.2s, transform 0.2s, opacity 0.2s",
         }}
       >
         {!isConnected ? "Connect Wallet" : needsApproval ? "Approve USDT" : betPending ? "Placing Bet..." : `Place ${amount} USDT`}

@@ -50,7 +50,7 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
   };
 
   return (
-    <div style={{
+    <div className="animate-slideDown" style={{
       padding: 16, borderRadius: 12,
       background: "var(--card)", border: "1px solid var(--border)",
       marginTop: 8,
@@ -97,6 +97,7 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
               marginLeft: "auto", padding: "4px 16px", borderRadius: 6, border: "none",
               background: "var(--green)", color: "#080810", fontWeight: 600,
               fontSize: 12, cursor: "pointer", opacity: postPending ? 0.6 : 1,
+              transition: "filter 0.2s, transform 0.2s",
             }}
           >
             {postPending ? "Posting..." : "Post"}

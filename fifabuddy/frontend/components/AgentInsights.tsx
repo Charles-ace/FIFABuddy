@@ -57,7 +57,7 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
   const colors = signal ? signalColors[signal.signal] : signalColors.HOLD;
 
   return (
-    <div style={{
+    <div className="card-enter card-hover" style={{
       padding: 16, borderRadius: 12,
       background: "var(--card)", border: "1px solid var(--border)",
     }}>
@@ -72,19 +72,19 @@ export function AgentInsights({ fixture, poolOdds, communityPosts }: Props) {
           style={{
             padding: "4px 12px", borderRadius: 6, border: "1px solid var(--border)",
             background: "transparent", color: "var(--muted)", fontSize: 11,
-            cursor: "pointer",
+            cursor: "pointer", transition: "border-color 0.2s, color 0.2s",
           }}
         >
-          {loading ? "Thinking..." : "Refresh"}
+            {loading ? "Thinking..." : "Refresh"}
         </button>
       </div>
 
       {loading && !signal && (
         <div style={{ padding: "20px 0", textAlign: "center" }}>
-          <div style={{
+          <div className="animate-spin" style={{
             width: 24, height: 24, border: "2px solid var(--border)",
             borderTopColor: "var(--green)", borderRadius: "50%",
-            margin: "0 auto 8px", animation: "spin 0.8s linear infinite",
+            margin: "0 auto 8px",
           }} />
           <span style={{ fontSize: 12, color: "var(--muted)" }}>Claude is analysing...</span>
         </div>
