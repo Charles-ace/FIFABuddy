@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const awayTeam = fixture.team2 || fixture.away;
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 300,
       system: `You are FIFABuddy, a World Cup 2026 AI prediction agent on X Layer.
 You receive match data, on-chain pool totals, community sentiment, and top analyst consensus.

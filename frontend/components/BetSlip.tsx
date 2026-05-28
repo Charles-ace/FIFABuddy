@@ -10,7 +10,8 @@ import {
   usePlaceBet,
   useApproveUsdt,
 } from "@/hooks/usePredictionMarket";
-import { activeXLayerChain, getSupportedConnector, getXLayerExplorerTxUrl } from "@/lib/wagmi";
+import { useNetwork } from "@/lib/NetworkContext";
+import { getSupportedConnector, getXLayerExplorerTxUrl } from "@/lib/wagmi";
 
 type Props = {
   fixture: FootballFixture;
@@ -35,6 +36,7 @@ type TradeIntent = {
 export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
   const { address, isConnected } = useAccount();
   const { connectAsync, connectors } = useConnect();
+  const { activeChain } = useNetwork();
   const [pick, setPick] = useState<"home" | "draw" | "away">("home");
   const [amount, setAmount] = useState("25");
   const [note, setNote] = useState("Backing the live favorite based on analyst flow.");
@@ -104,7 +106,7 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
     if (!connector) return;
 
     try {
-      await connectAsync({ connector, chainId: activeXLayerChain.id });
+      await connectAsync({ connector, chainId: activeChain.id });
     } catch (error) {
       console.error("Wallet connection failed", error);
     }
