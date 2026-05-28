@@ -16,7 +16,7 @@ export default function Page() {
   const [fixtures, setFixtures] = useState<MergedFixture[]>([]);
   const [selectedFixture, setSelectedFixture] = useState<MergedFixture | null>(null);
   const [betOutcome, setBetOutcome] = useState<1 | 2 | 3 | null>(null);
-  const [showCommunity, setShowCommunity] = useState<Record<number, boolean>>({});
+  const [showCommunity, setShowCommunity] = useState<Record<string, boolean>>({});
 
   const activeFixture = selectedFixture || fixtures[0];
 
