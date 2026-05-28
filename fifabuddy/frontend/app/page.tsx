@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Header } from "@/components/Header";
