@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
+import { useAccount } from "wagmi";
 import { xlayerMainnet, xlayerTestnet, type SupportedChain } from "@/lib/wagmi";
 
 // ─── Contract address maps ────────────────────────────────────────────────────
@@ -37,6 +38,18 @@ const NetworkContext = createContext<NetworkContextValue | null>(null);
 // ─── Provider ─────────────────────────────────────────────────────────────────
 export function NetworkProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<NetworkMode>("mainnet");
+  const { chainId, isConnected } = useAccount();
+
+  // Sync mode with the connected wallet's chain
+  useEffect(() => {
+    if (isConnected && chainId) {
+      if (chainId === xlayerTestnet.id) {
+        setModeState("testnet");
+      } else if (chainId === xlayerMainnet.id) {
+        setModeState("mainnet");
+      }
+    }
+  }, [chainId, isConnected]);
 
   const setMode = useCallback((next: NetworkMode) => {
     setModeState(next);

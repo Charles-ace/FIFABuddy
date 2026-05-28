@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from "wagmi";
-import { getSupportedConnector } from "@/lib/wagmi";
+import { getSupportedConnector, xlayerMainnet, xlayerTestnet } from "@/lib/wagmi";
 import { useNetwork } from "@/lib/NetworkContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,6 +32,19 @@ export function Header() {
       await switchChainAsync({ chainId: activeChain.id });
     } catch (error) {
       console.error("Network switch failed", error);
+    }
+  };
+
+  const handleNetworkToggleClick = async () => {
+    if (isConnected) {
+      try {
+        const nextChainId = isTestnet ? xlayerMainnet.id : xlayerTestnet.id;
+        await switchChainAsync({ chainId: nextChainId });
+      } catch (error) {
+        console.error("Failed to switch network in wallet", error);
+      }
+    } else {
+      toggleNetwork();
     }
   };
 
@@ -77,7 +90,7 @@ export function Header() {
           type="button"
           id="network-toggle-btn"
           className={`network-toggle-pill ${isTestnet ? "testnet" : "mainnet"}`}
-          onClick={toggleNetwork}
+          onClick={handleNetworkToggleClick}
           title={`Switch to ${isTestnet ? "Mainnet" : "Testnet"}`}
         >
           <span className="network-dot" />
