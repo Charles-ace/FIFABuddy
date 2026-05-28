@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAccount, useConnect } from "wagmi";
 import { usePostPrediction, useUpvote } from "@/hooks/useCommunityBoard";
-import { formatUnits } from "viem";
 import { xlayerTestnet } from "@/lib/wagmi";
 
 type Post = {
@@ -28,17 +27,13 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
   const { connectAsync, connectors } = useConnect();
   const [text, setText] = useState("");
   const [pick, setPick] = useState("Home");
-  const { postPrediction, hash: postHash, isPending: postPending, isSuccess: postSuccess } = usePostPrediction();
-  const { upvote, hash: upvoteHash, isPending: upvotePending, isSuccess: upvoteSuccess } = useUpvote();
+  const { postPrediction, hash: postHash, isPending: postPending } = usePostPrediction();
+  const { upvote, hash: upvoteHash, isPending: upvotePending } = useUpvote();
 
   const handleConnect = async () => {
     const connector = connectors[0];
     if (!connector) return;
-    try {
-      await connectAsync({ connector, chainId: xlayerTestnet.id });
-    } catch (error) {
-      console.error("Wallet connection failed", error);
-    }
+    try { await connectAsync({ connector, chainId: xlayerTestnet.id }); } catch { /* ignore */ }
   };
 
   const handlePost = async () => {
@@ -50,12 +45,16 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
   };
 
   return (
-    <div className="animate-slideDown" style={{
-      padding: 16, borderRadius: 12,
-      background: "var(--card)", border: "1px solid var(--border)",
-      marginTop: 8,
+    <div className="anim-slideUp" style={{
+      padding: 14, borderRadius: 10,
+      background: "var(--bg-card)",
+      border: "1px solid var(--border-subtle)",
+      marginTop: 4, marginBottom: 12,
     }}>
-      <h4 style={{ margin: "0 0 12px", fontSize: 14, color: "var(--text)" }}>
+      <h4 className="gradient-green" style={{
+        margin: "0 0 12px", fontSize: 13, fontWeight: 700,
+        fontFamily: "var(--font-display)",
+      }}>
         Community Predictions
       </h4>
 
@@ -68,9 +67,10 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
           rows={2}
           style={{
             width: "100%", padding: "10px 12px", borderRadius: 8,
-            border: "1px solid var(--border)", background: "transparent",
-            color: "var(--text)", fontSize: 13, outline: "none",
+            border: "1px solid var(--border-glass)", background: "rgba(255,255,255,0.02)",
+            color: "var(--text-primary)", fontSize: 12, outline: "none",
             resize: "vertical", boxSizing: "border-box",
+            fontFamily: "var(--font-body)",
           }}
         />
         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
@@ -79,12 +79,8 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
               key={p}
               type="button"
               onClick={() => setPick(p)}
-              style={{
-                padding: "4px 12px", borderRadius: 6, border: "1px solid var(--border)",
-                background: pick === p ? "var(--green-dim)" : "transparent",
-                color: pick === p ? "var(--green)" : "var(--muted)",
-                fontSize: 11, cursor: "pointer",
-              }}
+              className={pick === p ? "btn-primary" : "btn-outline"}
+              style={{ padding: "4px 12px", fontSize: 10, fontFamily: "var(--font-display)" }}
             >
               {p}
             </button>
@@ -93,12 +89,8 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
             type="button"
             onClick={handlePost}
             disabled={postPending || !text.trim()}
-            style={{
-              marginLeft: "auto", padding: "4px 16px", borderRadius: 6, border: "none",
-              background: "var(--green)", color: "#080810", fontWeight: 600,
-              fontSize: 12, cursor: "pointer", opacity: postPending ? 0.6 : 1,
-              transition: "filter 0.2s, transform 0.2s",
-            }}
+            className="btn-primary"
+            style={{ marginLeft: "auto", padding: "4px 16px", fontSize: 11, fontFamily: "var(--font-display)" }}
           >
             {postPending ? "Posting..." : "Post"}
           </button>
@@ -106,42 +98,34 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
       </div>
 
       {postHash && (
-        <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 8 }}>
-          Post tx:{" "}
-          <a href={`${EXPLORER}/tx/${postHash}`} target="_blank" rel="noreferrer" style={{ color: "var(--blue)" }}>
-            {postHash.slice(0, 10)}...
-          </a>
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>
+          Post: <a href={`${EXPLORER}/tx/${postHash}`} target="_blank" rel="noreferrer" style={{ color: "var(--blue)" }}>{postHash.slice(0, 10)}...</a>
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {posts.length === 0 && (
-          <p style={{ fontSize: 12, color: "var(--muted)", margin: 0 }}>
+          <p style={{ fontSize: 11, color: "var(--text-muted)", margin: 0, fontFamily: "var(--font-display)" }}>
             No predictions yet. Be the first!
           </p>
         )}
         {posts.map((post) => (
-          <div
-            key={post.id.toString()}
-            style={{
-              padding: 10, borderRadius: 8,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid var(--border)",
-            }}
-          >
+          <div key={post.id.toString()} className="glass-card" style={{
+            padding: 10, borderRadius: 8,
+          }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <span style={{ fontSize: 11, color: "var(--muted)" }}>
+              <span style={{ fontSize: 10, color: "var(--text-muted)", fontFamily: "var(--font-display)" }}>
                 {post.author.slice(0, 6)}...{post.author.slice(-4)}
               </span>
               <span style={{
-                fontSize: 10, padding: "1px 6px", borderRadius: 4,
+                fontSize: 9, padding: "1px 6px", borderRadius: 3,
                 background: "var(--green-dim)", color: "var(--green)",
-                fontWeight: 600,
+                fontWeight: 700, fontFamily: "var(--font-display)",
               }}>
                 {post.pick}
               </span>
             </div>
-            <p style={{ margin: "4px 0", fontSize: 13, color: "var(--text)" }}>
+            <p style={{ margin: "4px 0", fontSize: 12, color: "var(--text-primary)" }}>
               {post.text}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -149,15 +133,13 @@ export function CommunityPanel({ matchId, posts, onNewPost, onUpvote }: Props) {
                 type="button"
                 onClick={async () => { await upvote(post.id); onUpvote?.(); }}
                 disabled={upvotePending}
-                style={{
-                  background: "none", border: "none", color: "var(--gold)",
-                  cursor: "pointer", fontSize: 12, padding: 0,
-                }}
+                className="btn-outline"
+                style={{ border: "none", fontSize: 11, padding: 0 }}
               >
                 ▲ {post.upvotes.toString()}
               </button>
               {upvoteHash && (
-                <a href={`${EXPLORER}/tx/${upvoteHash}`} target="_blank" rel="noreferrer" style={{ fontSize: 10, color: "var(--blue)" }}>
+                <a href={`${EXPLORER}/tx/${upvoteHash}`} target="_blank" rel="noreferrer" style={{ fontSize: 9, color: "var(--blue)" }}>
                   tx
                 </a>
               )}

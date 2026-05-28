@@ -34,21 +34,16 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
 
   const parsedAmount = parseUnits(amount || "0", 6);
   const needsApproval = isConnected && allowance < parsedAmount;
-
   const selectedTeam = pick === 1 ? fixture.team1 : pick === 3 ? fixture.team2 : "Draw";
 
   useEffect(() => { if (outcome) setPick(outcome); }, [outcome]);
   useEffect(() => { if (betSuccess) { refetchBalance(); refetchAllowance(); onBetPlaced?.(); } }, [betSuccess]);
-  useEffect(() => { if (approveSuccess) { refetchAllowance(); } }, [approveSuccess]);
+  useEffect(() => { if (approveSuccess) refetchAllowance(); }, [approveSuccess]);
 
   const handleConnect = async () => {
     const connector = connectors[0];
     if (!connector) return;
-    try {
-      await connectAsync({ connector, chainId: xlayerTestnet.id });
-    } catch (error) {
-      console.error("Wallet connection failed", error);
-    }
+    try { await connectAsync({ connector, chainId: xlayerTestnet.id }); } catch { /* ignore */ }
   };
 
   const handleAction = async () => {
@@ -58,37 +53,44 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
   };
 
   return (
-    <div className="animate-scaleIn gradient-border" style={{
+    <div className="anim-scale border-glow" style={{
       padding: 16, borderRadius: 12,
-      background: "var(--card)", border: "1px solid transparent",
+      background: "var(--bg-card)",
+      border: "1px solid transparent",
       marginBottom: 12,
     }}>
+      {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <h3 className="gradient-text-green" style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>Bet Slip</h3>
+        <h3 className="gradient-green" style={{
+          margin: 0, fontSize: 14, fontWeight: 800, fontFamily: "var(--font-display)",
+        }}>
+          Bet Slip
+        </h3>
         {onClose && (
-          <button type="button" onClick={onClose} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 16 }}>
+          <button type="button" onClick={onClose} style={{
+            background: "none", border: "none", color: "var(--text-muted)",
+            cursor: "pointer", fontSize: 16,
+          }}>
             ✕
           </button>
         )}
       </div>
 
-      <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
+      <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12, fontFamily: "var(--font-display)" }}>
         {fixture.team1} vs {fixture.team2}
       </div>
 
+      {/* Pick */}
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-        {        [{ v: 1, l: fixture.team1 }, { v: 2, l: "Draw" }, { v: 3, l: fixture.team2 }].map(({ v, l }) => (
+        {[{ v: 1, l: fixture.team1 }, { v: 2, l: "Draw" }, { v: 3, l: fixture.team2 }].map(({ v, l }) => (
           <button
             key={v}
             type="button"
             onClick={() => setPick(v as 1 | 2 | 3)}
+            className={pick === v ? "btn-primary" : "btn-outline"}
             style={{
-              flex: 1, padding: "8px 0", borderRadius: 8,
-              background: pick === v ? "var(--green-dim)" : "transparent",
-              border: pick === v ? "1px solid var(--green)" : "1px solid var(--border)",
-              color: pick === v ? "var(--green)" : "var(--muted)",
-              fontWeight: 600, fontSize: 11, cursor: "pointer",
-              transition: "all 0.2s",
+              flex: 1, padding: "8px 0", fontSize: 10,
+              fontFamily: "var(--font-display)",
             }}
           >
             {l}
@@ -96,8 +98,12 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
         ))}
       </div>
 
+      {/* Amount */}
       <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, color: "var(--muted)", display: "block", marginBottom: 4 }}>
+        <label style={{
+          fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 4,
+          fontFamily: "var(--font-display)", fontWeight: 600,
+        }}>
           Stake (USDT)
         </label>
         <input
@@ -106,70 +112,71 @@ export function BetSlip({ fixture, outcome, onBetPlaced, onClose }: Props) {
           inputMode="decimal"
           style={{
             width: "100%", padding: "10px 12px", borderRadius: 8,
-            border: "1px solid var(--border)", background: "transparent",
-            color: "var(--text)", fontSize: 14, outline: "none",
-            boxSizing: "border-box",
+            border: "1px solid var(--border-glass)", background: "rgba(255,255,255,0.03)",
+            color: "var(--text-primary)", fontSize: 13, outline: "none",
+            boxSizing: "border-box", fontFamily: "var(--font-display)",
           }}
         />
       </div>
 
+      {/* Presets */}
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
         {["10", "25", "50", "100"].map((preset) => (
           <button
             key={preset}
             type="button"
             onClick={() => setAmount(preset)}
-            style={{
-              padding: "6px 12px", borderRadius: 6, border: "1px solid var(--border)",
-              background: amount === preset ? "var(--green-dim)" : "transparent",
-              color: amount === preset ? "var(--green)" : "var(--muted)",
-              fontSize: 12, cursor: "pointer",
-            }}
+            className={amount === preset ? "btn-primary" : "btn-outline"}
+            style={{ padding: "6px 12px", fontSize: 11, fontFamily: "var(--font-display)" }}
           >
             {preset}
           </button>
         ))}
       </div>
 
+      {/* Payout */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-        <span style={{ fontSize: 12, color: "var(--muted)" }}>Payout</span>
-        <strong className="gradient-text-green" style={{ fontSize: 16 }}>
+        <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-display)" }}>
+          Payout
+        </span>
+        <strong className="gradient-green" style={{
+          fontSize: 16, fontFamily: "var(--font-display)",
+        }}>
           {amount} USDT
         </strong>
       </div>
 
       {isConnected && (
-        <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8, fontFamily: "var(--font-display)" }}>
           Balance: {formatUnits(balance, 6)} USDT
         </div>
       )}
 
       {approveHash && (
-        <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 8 }}>
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>
           Approve: <a href={`${EXPLORER}/tx/${approveHash}`} target="_blank" rel="noreferrer" style={{ color: "var(--blue)" }}>{approveHash.slice(0, 10)}...</a>
         </div>
       )}
 
       {betHash && (
-        <div style={{ fontSize: 11, color: "var(--green)", marginBottom: 8 }}>
+        <div style={{ fontSize: 10, color: "var(--green)", marginBottom: 8 }}>
           Bet: <a href={`${EXPLORER}/tx/${betHash}`} target="_blank" rel="noreferrer" style={{ color: "var(--blue)" }}>{betHash.slice(0, 10)}...</a>
         </div>
       )}
 
       {betError && (
-        <div style={{ fontSize: 12, color: "var(--red)", marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "var(--red)", marginBottom: 8 }}>
           {betError.message.slice(0, 80)}
         </div>
       )}
 
+      {/* Action */}
       <button
         type="button"
         onClick={handleAction}
         disabled={betPending || approvePending}
         className={needsApproval ? "btn-gold" : "btn-primary"}
-        style={{
-          width: "100%", padding: "12px 0", fontSize: 14,
-        }}
+        style={{ width: "100%", padding: "12px 0", fontSize: 13, fontFamily: "var(--font-display)" }}
       >
         {!isConnected ? "Connect Wallet" : needsApproval ? "Approve USDT" : betPending ? "Placing Bet..." : `Place ${amount} USDT`}
       </button>

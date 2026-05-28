@@ -13,18 +13,11 @@ const stats: Stat[] = [
   { label: "Markets Open", value: "12", accent: "red" },
 ];
 
-const accentColors = {
-  green: "var(--green)",
-  gold: "var(--gold)",
-  blue: "var(--blue)",
-  red: "var(--red)",
-};
-
-const accentGradients = {
-  green: "linear-gradient(135deg, var(--green), #00ff88)",
-  gold: "linear-gradient(135deg, var(--gold), #ffd700)",
-  blue: "linear-gradient(135deg, var(--blue), #6db3ff)",
-  red: "linear-gradient(135deg, var(--red), #ff6b8a)",
+const accents = {
+  green: { grad: "linear-gradient(135deg, var(--green), var(--green-bright))", shadow: "rgba(0,232,122,0.15)" },
+  gold:  { grad: "linear-gradient(135deg, var(--gold), #ffd700)", shadow: "rgba(245,200,66,0.15)" },
+  blue:  { grad: "linear-gradient(135deg, var(--blue), #6db3ff)", shadow: "rgba(79,142,247,0.15)" },
+  red:   { grad: "linear-gradient(135deg, var(--red), #ff6b8a)", shadow: "rgba(255,77,109,0.15)" },
 };
 
 export function StatCards() {
@@ -33,45 +26,45 @@ export function StatCards() {
       display: "grid",
       gridTemplateColumns: "repeat(4, 1fr)",
       gap: 12,
-      marginBottom: 24,
+      marginBottom: 28,
     }}>
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className="card-enter card-hover"
-          style={{
-            padding: "18px 20px",
-            borderRadius: 12,
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            position: "relative", overflow: "hidden",
-          }}
-        >
-          <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: 3,
-            background: accentGradients[stat.accent],
-            backgroundSize: "200% 100%",
-            animation: "gradientShift 3s ease infinite",
-          }} />
-          <p style={{
-            margin: "0 0 8px", fontSize: 12, color: "var(--muted)",
-            fontWeight: 500, letterSpacing: "0.3px",
-          }}>
-            {stat.label}
-          </p>
-          <p className={`animate-glowPulse`} style={{
-            margin: 0, fontSize: 24, fontWeight: 800,
-            background: accentGradients[stat.accent],
-            backgroundSize: "200% 200%",
-            animation: "gradientShift 4s ease infinite, glowPulse 2s ease-in-out infinite",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}>
-            {stat.value}
-          </p>
-        </div>
-      ))}
+      {stats.map((stat, i) => {
+        const a = accents[stat.accent];
+        return (
+          <div
+            key={stat.label}
+            className="glass-card"
+            style={{
+              padding: "18px 20px",
+              position: "relative", overflow: "hidden",
+              animation: `fadeUp 0.4s ease ${0.05 + i * 0.06}s forwards`,
+              opacity: 0,
+            }}
+          >
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: 3,
+              background: a.grad,
+            }} />
+            <p style={{
+              margin: "0 0 8px", fontSize: 11, color: "var(--text-muted)",
+              fontWeight: 500, letterSpacing: "0.5px",
+              fontFamily: "var(--font-display)",
+            }}>
+              {stat.label}
+            </p>
+            <p style={{
+              margin: 0, fontSize: 24, fontWeight: 800,
+              fontFamily: "var(--font-display)",
+              background: a.grad,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              {stat.value}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 }
