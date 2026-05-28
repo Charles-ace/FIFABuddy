@@ -1,5 +1,5 @@
 {
-  "name": "matchmind-frontend",
+  "name": "fifabuddy-frontend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -15,8 +15,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "viem": "^2.50.4",
-    "wagmi": "^3.6.15",
-    "porto": "^0.2.37"
+    "wagmi": "^3.6.15"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
