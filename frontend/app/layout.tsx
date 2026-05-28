@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
-import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -51,7 +50,6 @@ export default function RootLayout({
           })();
         `}</Script>
         <Providers>{children}</Providers>
-        <SiteFooter />
       </body>
     </html>
   );

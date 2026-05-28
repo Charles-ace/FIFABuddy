@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from "wagmi";
-import { getSupportedConnector, xlayerMainnet, xlayerTestnet } from "@/lib/wagmi";
+import { getSupportedWalletConnectors, getWalletKind, xlayerMainnet, xlayerTestnet } from "@/lib/wagmi";
 import { useNetwork } from "@/lib/NetworkContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,11 +14,14 @@ export function Header() {
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
   const pathname = usePathname();
-  const { mode, activeChain, isTestnet, toggleNetwork } = useNetwork();
+  const { activeChain, isTestnet, toggleNetwork } = useNetwork();
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [connectingConnectorUid, setConnectingConnectorUid] = useState<string | null>(null);
+  const [walletError, setWalletError] = useState<string | null>(null);
 
   const isCorrectNetwork = chainId === activeChain.id;
+  const walletConnectors = getSupportedWalletConnectors(connectors);
 
   const handleSwitchNetwork = async () => {
     try {
@@ -150,24 +153,47 @@ export function Header() {
               <button className="wallet-modal-close" onClick={() => setIsWalletModalOpen(false)}>✕</button>
             </div>
             <p className="wallet-modal-desc">Choose how you want to connect to X Layer {isTestnet ? "Testnet" : "Mainnet"}</p>
+            {walletError ? <p className="wallet-modal-error">{walletError}</p> : null}
             <div className="wallet-connectors-list">
-              {connectors.filter(c => c.id === 'metaMask' || c.id === 'okxWallet').map((connector) => (
+              {walletConnectors.map((connector) => {
+                const walletKind = getWalletKind(connector);
+                const connectorLabel = walletKind === "okx" ? "OKX Wallet" : "MetaMask";
+                const isConnecting = connectingConnectorUid === connector.uid;
+
+                return (
                 <button
                   key={connector.uid}
                   className="wallet-connector-btn"
+                  disabled={isConnecting}
                   onClick={async () => {
+                    setConnectingConnectorUid(connector.uid);
+                    setWalletError(null);
+
                     try {
                       await connectAsync({ connector, chainId: activeChain.id });
                       setIsWalletModalOpen(false);
                     } catch (err) {
                       console.error("Connection error:", err);
+                      setWalletError(
+                        err instanceof Error
+                          ? err.message
+                          : `Could not connect to ${connectorLabel}. Make sure the extension is installed and unlocked.`
+                      );
+                    } finally {
+                      setConnectingConnectorUid(null);
                     }
                   }}
                 >
-                  <span className="wallet-connector-name">{connector.name}</span>
-                  <span className="wallet-connector-arrow">→</span>
+                  <span className="wallet-connector-name">{connectorLabel}</span>
+                  <span className="wallet-connector-arrow">{isConnecting ? "..." : "→"}</span>
                 </button>
-              ))}
+              );
+              })}
+              {walletConnectors.length === 0 ? (
+                <p className="wallet-modal-error">
+                  No MetaMask or OKX provider was detected. Install one of the extensions, then reload this page.
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

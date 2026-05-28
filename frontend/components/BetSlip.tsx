@@ -103,7 +103,10 @@ export function BetSlip({ fixture, onBetPlaced, copyTradeRequest }: Props) {
 
   const handleConnect = async () => {
     const connector = getSupportedConnector(connectors);
-    if (!connector) return;
+    if (!connector) {
+      console.error("No MetaMask or OKX connector was detected.");
+      return;
+    }
 
     try {
       await connectAsync({ connector, chainId: activeChain.id });

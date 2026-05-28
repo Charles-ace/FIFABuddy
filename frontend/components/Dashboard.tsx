@@ -11,9 +11,6 @@ import { FlagIcon } from "@/components/FlagIcon";
 import { analysts, communityPosts as mockPosts } from "@/lib/mockData";
 import type { FootballFixture } from "@/lib/football";
 import { useOdds } from "@/hooks/usePredictionMarket";
-import { useAccount } from "wagmi";
-import Link from "next/link";
-import Image from "next/image";
 
 type Props = {
   fixtures: FootballFixture[];
@@ -35,7 +32,6 @@ type CopyTradeRequest = {
 };
 
 export function Dashboard({ fixtures: initialFixtures }: Props) {
-  const { isConnected } = useAccount();
   const [fixtures, setFixtures] = useState(initialFixtures);
   const [activeFixtureId, setActiveFixtureId] = useState(initialFixtures[0]?.id ?? 0);
   const [isMarketRefreshing, setIsMarketRefreshing] = useState(false);
@@ -121,7 +117,15 @@ export function Dashboard({ fixtures: initialFixtures }: Props) {
         <section className="hero colorful-hero">
           <div className="hero-backdrop" style={{ backgroundImage: "url('/vibrant_stadium.png')" }}>
             <div className="hero-overlay"></div>
-            <img src="/dynamic_footballer.png" alt="Footballer" className="hero-footballer-anim" />
+            <div className="hero-motion-layer" aria-hidden="true">
+              <span className="motion-pitch motion-pitch-one" />
+              <span className="motion-pitch motion-pitch-two" />
+              <span className="motion-ball" />
+              <span className="motion-trail motion-trail-one" />
+              <span className="motion-trail motion-trail-two" />
+              <span className="motion-ticker motion-ticker-one">AI FORM +12%</span>
+              <span className="motion-ticker motion-ticker-two">POOL SHIFT</span>
+            </div>
           </div>
           
           <div className="hero-content-wrapper">
