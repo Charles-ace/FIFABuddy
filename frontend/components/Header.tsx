@@ -5,7 +5,6 @@ import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } fro
 import { getSupportedWalletConnectors, getWalletKind, xlayerMainnet, xlayerTestnet } from "@/lib/wagmi";
 import { useNetwork } from "@/lib/NetworkContext";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export function Header() {
   const { address, isConnected } = useAccount();
@@ -13,7 +12,6 @@ export function Header() {
   const { disconnect } = useDisconnect();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
-  const pathname = usePathname();
   const { activeChain, isTestnet, toggleNetwork } = useNetwork();
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -71,14 +69,6 @@ export function Header() {
           </svg>
           <span className="brand-text">FIFABuddy</span>
         </Link>
-
-        <nav className="nav-links">
-          <Link href="/" className={`nav-link ${pathname === "/" ? "active" : ""}`}>
-            Dashboard
-          </Link>
-          <a href="#predictions" className="nav-link">Predictions</a>
-          <a href="#community" className="nav-link">Community</a>
-        </nav>
 
         <div className="topbar-actions">
           {/* ── Network toggle pill ── */}

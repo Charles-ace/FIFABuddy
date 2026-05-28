@@ -78,6 +78,16 @@ const TTL = {
   lineups: 300_000,
 } as const;
 
+function createTimeoutSignal(timeoutMs = 5_000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  return {
+    signal: controller.signal,
+    clear: () => clearTimeout(timeoutId),
+  };
+}
+
 async function cached<T>(key: string, ttl: number, fetcher: () => Promise<T>): Promise<T> {
   const hit = cache.get(key);
   if (hit && Date.now() - hit.ts < ttl) {
@@ -100,12 +110,14 @@ function fallbackOdds(index: number) {
 
 export async function getWC2026Fixtures(): Promise<FootballFixture[]> {
   return cached("wc_fixtures", TTL.fixtures, async () => {
+    const timeout = createTimeoutSignal();
     const res = await fetch(OPEN_FOOTBALL_URL, {
       headers: {
         "Content-Type": "application/json",
       },
       next: { revalidate: 3600 },
-    });
+      signal: timeout.signal,
+    }).finally(timeout.clear);
 
     if (!res.ok) {
       throw new Error(`OpenFootball request failed: ${res.status} ${res.statusText}`);
@@ -142,6 +154,7 @@ export async function getLiveMatches(): Promise<ApiFootballFixture[]> {
   }
 
   return cached("live_matches", TTL.live, async () => {
+    const timeout = createTimeoutSignal();
     const res = await fetch(
       `https://${RAPIDAPI_HOST}/v3/fixtures?live=all&league=${WC_2026_LEAGUE_ID}&season=2026`,
       {
@@ -150,8 +163,9 @@ export async function getLiveMatches(): Promise<ApiFootballFixture[]> {
           "X-RapidAPI-Host": RAPIDAPI_HOST,
         },
         next: { revalidate: 60 },
+        signal: timeout.signal,
       }
-    );
+    ).finally(timeout.clear);
 
     if (!res.ok) {
       throw new Error(`API-Football live request failed: ${res.status} ${res.statusText}`);
@@ -168,6 +182,7 @@ export async function getUpcomingFixtures(nextCount = 10): Promise<ApiFootballFi
   }
 
   return cached(`upcoming_${nextCount}`, TTL.fixtures, async () => {
+    const timeout = createTimeoutSignal();
     const res = await fetch(
       `https://${RAPIDAPI_HOST}/v3/fixtures?league=${WC_2026_LEAGUE_ID}&season=2026&next=${nextCount}`,
       {
@@ -176,8 +191,9 @@ export async function getUpcomingFixtures(nextCount = 10): Promise<ApiFootballFi
           "X-RapidAPI-Host": RAPIDAPI_HOST,
         },
         next: { revalidate: 3600 },
+        signal: timeout.signal,
       }
-    );
+    ).finally(timeout.clear);
 
     if (!res.ok) {
       throw new Error(`API-Football upcoming request failed: ${res.status} ${res.statusText}`);
@@ -194,6 +210,7 @@ export async function getStandings(): Promise<unknown[]> {
   }
 
   return cached("standings", TTL.standings, async () => {
+    const timeout = createTimeoutSignal();
     const res = await fetch(
       `https://${RAPIDAPI_HOST}/v3/standings?league=${WC_2026_LEAGUE_ID}&season=2026`,
       {
@@ -202,8 +219,9 @@ export async function getStandings(): Promise<unknown[]> {
           "X-RapidAPI-Host": RAPIDAPI_HOST,
         },
         next: { revalidate: 300 },
+        signal: timeout.signal,
       }
-    );
+    ).finally(timeout.clear);
 
     if (!res.ok) {
       throw new Error(`API-Football standings request failed: ${res.status} ${res.statusText}`);
@@ -220,6 +238,7 @@ export async function getLineups(fixtureId: number): Promise<unknown[]> {
   }
 
   return cached(`lineups_${fixtureId}`, TTL.lineups, async () => {
+    const timeout = createTimeoutSignal();
     const res = await fetch(
       `https://${RAPIDAPI_HOST}/v3/fixtures/lineups?fixture=${fixtureId}`,
       {
@@ -228,8 +247,9 @@ export async function getLineups(fixtureId: number): Promise<unknown[]> {
           "X-RapidAPI-Host": RAPIDAPI_HOST,
         },
         next: { revalidate: 300 },
+        signal: timeout.signal,
       }
-    );
+    ).finally(timeout.clear);
 
     if (!res.ok) {
       throw new Error(`API-Football lineups request failed: ${res.status} ${res.statusText}`);

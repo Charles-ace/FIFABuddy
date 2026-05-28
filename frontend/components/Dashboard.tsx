@@ -8,7 +8,7 @@ import { AnalystRow } from "@/components/AnalystRow";
 import { AgentInsights } from "@/components/AgentInsights";
 import { Header } from "@/components/Header";
 import { FlagIcon } from "@/components/FlagIcon";
-import { analysts, communityPosts as mockPosts } from "@/lib/mockData";
+import { analysts, communityPosts as mockPosts, type Analyst } from "@/lib/mockData";
 import type { FootballFixture } from "@/lib/football";
 import { useOdds } from "@/hooks/usePredictionMarket";
 
@@ -84,6 +84,24 @@ export function Dashboard({ fixtures: initialFixtures }: Props) {
     });
   };
 
+  const handleAnalystCopy = (analyst: Analyst) => {
+    const outcome = analyst.pick === "draw" ? 2 : analyst.pick === "away" ? 3 : 1;
+    const pickLabel =
+      analyst.pick === "home"
+        ? `${activeFixture.home} ML`
+        : analyst.pick === "away"
+          ? `${activeFixture.away} ML`
+          : "Draw";
+
+    setCopyTradeRequest({
+      id: activeFixture.id,
+      amount: analyst.confidence >= 90 ? "50" : analyst.confidence >= 80 ? "35" : "25",
+      outcome,
+      pickLabel: `${analyst.handle}: ${pickLabel}`,
+      source: "agent",
+    });
+  };
+
   const activeMockPosts = mockPosts
     .filter(
       (p) =>
@@ -148,6 +166,25 @@ export function Dashboard({ fixtures: initialFixtures }: Props) {
                   {isMarketRefreshing ? "Refreshing..." : "Refresh Market"}
                 </button>
               </div>
+
+              <div className="mode-switch-panel" aria-label="Execution mode">
+                <button
+                  type="button"
+                  className={`mode-switch-btn ${isAutoMode ? "active" : ""}`}
+                  onClick={() => setIsAutoMode(true)}
+                >
+                  Auto Mode
+                  <span>Agent can execute BUY signals when analysts agree.</span>
+                </button>
+                <button
+                  type="button"
+                  className={`mode-switch-btn ${!isAutoMode ? "active" : ""}`}
+                  onClick={() => setIsAutoMode(false)}
+                >
+                  Manual Mode
+                  <span>Review signals and analyst copies before execution.</span>
+                </button>
+              </div>
             </div>
 
             <div className="hero-stats colorful-stats">
@@ -181,6 +218,11 @@ export function Dashboard({ fixtures: initialFixtures }: Props) {
                   <span>pool USDT</span>
                 </div>
               </div>
+            </div>
+
+            <div className="hero-player-cards" aria-hidden="true">
+              <img src="/mbappe_hero.png" alt="" className="player-card player-card-primary" />
+              <img src="/morocco_spain.png" alt="" className="player-card player-card-secondary" />
             </div>
           </div>
         </section>
@@ -237,21 +279,8 @@ export function Dashboard({ fixtures: initialFixtures }: Props) {
 
               <div className="analyst-list">
                 {analysts.map((analyst) => (
-                  <AnalystRow key={analyst.wallet} analyst={analyst} />
+                  <AnalystRow key={analyst.wallet} analyst={analyst} onCopy={handleAnalystCopy} />
                 ))}
-              </div>
-
-              <div className="auto-mode-row" style={{ marginTop: "16px", paddingTop: "12px" }}>
-                <span className={isAutoMode ? "auto-mode-label active" : "auto-mode-label"}>
-                  {isAutoMode ? "Auto Agent Enabled" : "Manual Mode"}
-                </span>
-                <button
-                  type="button"
-                  className="ghost-sm"
-                  onClick={() => setIsAutoMode(!isAutoMode)}
-                >
-                  Toggle
-                </button>
               </div>
             </div>
           </aside>

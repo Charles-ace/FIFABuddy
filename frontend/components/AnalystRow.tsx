@@ -2,9 +2,10 @@ import type { Analyst } from "@/lib/mockData";
 
 type Props = {
   analyst: Analyst;
+  onCopy?: (analyst: Analyst) => void;
 };
 
-export function AnalystRow({ analyst }: Props) {
+export function AnalystRow({ analyst, onCopy }: Props) {
   const initial = analyst.handle.slice(0, 1).toUpperCase();
   const pickLabel =
     analyst.pick === "home" ? "Home bias" : analyst.pick === "away" ? "Away bias" : "Draw bias";
@@ -22,6 +23,11 @@ export function AnalystRow({ analyst }: Props) {
         <span>
           {analyst.winRate} win rate · {analyst.pnl}
         </span>
+        {onCopy ? (
+          <button type="button" className="ghost-sm analyst-copy-btn" onClick={() => onCopy(analyst)}>
+            Copy
+          </button>
+        ) : null}
       </div>
     </div>
   );
