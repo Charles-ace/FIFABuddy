@@ -1,3 +1,4 @@
+import { injected } from "@wagmi/core";
 import { createConfig, http } from "wagmi";
 import type { Chain } from "viem";
 
@@ -14,36 +15,6 @@ export const xlayerTestnet = {
   },
   testnet: true,
 } as const satisfies Chain;
-
-function injected(): any {
-  let provider: any;
-  return {
-    id: "injected",
-    name: "Browser Wallet",
-    type: "injected",
-    async connect() {
-      provider = typeof window !== "undefined" ? (window as any).ethereum : undefined;
-      if (!provider) throw new Error("No injected wallet found");
-      const accounts: `0x${string}`[] = await provider.request({ method: "eth_requestAccounts" });
-      const chainId = await provider.request({ method: "eth_chainId" }).then(Number).catch(() => xlayerTestnet.id);
-      return { accounts, chainId };
-    },
-    async disconnect() {},
-    async getAccounts() {
-      if (!provider && typeof window !== "undefined") provider = (window as any).ethereum;
-      if (!provider) return [];
-      return provider.request({ method: "eth_accounts" });
-    },
-    async getChainId() {
-      if (!provider && typeof window !== "undefined") provider = (window as any).ethereum;
-      if (!provider) return xlayerTestnet.id;
-      return provider.request({ method: "eth_chainId" }).then(Number).catch(() => xlayerTestnet.id);
-    },
-    async isAuthorized() {
-      try { const accounts = await this.getAccounts(); return accounts.length > 0; } catch { return false; }
-    },
-  };
-}
 
 export const wagmiConfig = createConfig({
   chains: [xlayerTestnet],
